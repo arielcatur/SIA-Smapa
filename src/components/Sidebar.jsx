@@ -21,7 +21,7 @@ import {
   PowerIcon,
 } from "@heroicons/react/24/solid";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { BOOK, HOME, INFO } from "../Icons";
+import { BOOK, HOME, INFO } from "./Icons";
 
 export default function Sidebar() {
   const [open, setOpen] = React.useState(0);

@@ -1,34 +1,23 @@
-import React from "react";
-import { DocSearch } from "@docsearch/react";
-import { Input } from "@material-tailwind/react";
- 
-const APP_ID = "your-app-id";
-const INDEX_NAME = "your-index-name";
-const API_KEY = "your-algolia-api-key";
- 
-export function Search() {
+import { SEARCH } from "./Icons";
+
+export default function Search() {
   return (
-    <div className="group relative">
-      <Input
-        type="email"
-        placeholder="Search"
-        className="focus:!border-t-gray-900 group-hover:border-2 group-hover:!border-gray-900"
-        labelProps={{
-          className: "hidden",
-        }}
-        readOnly
-      />
-      <div className="absolute top-[calc(50%-1px)] right-2.5 -translate-y-2/4">
-        <kbd className="rounded border border-blue-gray-100 bg-white px-1 pt-px pb-0 text-xs font-medium text-gray-900 shadow shadow-black/5">
-          <span className="mr-0.5 inline-block translate-y-[1.5px] text-base">
-            ⌘
-          </span>
-          K
-        </kbd>
+    <form className="max-w-64 w-60">
+      <div className="relative">
+        <input
+          type="search"
+          id="default-search"
+          className="block w-full p-2  text-sm text-gray-900 border border-gray-300  bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Search"
+          required=""
+        />
+        <button
+          type="submit"
+          className="text-white absolute end-0 bottom-0 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium h-full px-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
+          <SEARCH/>
+        </button>
       </div>
-      <div className="absolute inset-0 w-full opacity-0">
-        <DocSearch indexName={INDEX_NAME} apiKey={API_KEY} appId={APP_ID} />
-      </div>
-    </div>
+    </form>
   );
 }

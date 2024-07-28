@@ -12,7 +12,7 @@ export function JadwalPelajaran() {
       <div className="ml-80 py-4">
         <p className="flex justify-center font-bold text-xl">Jadwal Pelajaran</p>
       </div>
-      <Card className="ml-96 mt-8 w-96">
+      <Card className="ml-96 mt-8 w-96 mx-16">
         <CardBody>
           <Typography variant="h5" color="blue-gray">
             Senin

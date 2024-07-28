@@ -1,4 +1,5 @@
 import { Card, Typography } from "@material-tailwind/react";
+import Search from "../Search";
 
 const TABLE_HEAD = [
   "No",
@@ -41,11 +42,11 @@ export function DaftarGuru() {
     <>
       <div className="ml-80 py-4">
         <p className="flex justify-center font-bold text-xl">
-          Jadwal Pelajaran
+          Daftar Guru
         </p>
-        <div>
-            <p>Daftar Guru</p>
-            
+        <div className="mx-4 flex justify-between">
+            <p className="pt-2 font-semibold text-base">Daftar Guru</p>
+            <Search/>
         </div>
       </div>
       <Card className="h-full ml-80">

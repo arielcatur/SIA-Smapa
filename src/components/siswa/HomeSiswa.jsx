@@ -1,5 +1,6 @@
 import Footer from "../Footer"
 import Navbar from "../Navbar"
+import Search from "../Search"
 import Sidebar from "../Sidebar"
 import { AbsenSiswa } from "./AbsenSiswa"
 import { DaftarGuru } from "./DaftarGuru"
@@ -12,6 +13,7 @@ export default function HomeSiswa () {
             {/* <AbsenSiswa/> */}
             {/* <JadwalPelajaran/> */}
             <DaftarGuru/>
+            {/* <Search/> */}
             <Footer/>
         </>
     )

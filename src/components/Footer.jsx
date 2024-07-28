@@ -1,5 +1,5 @@
 import { Typography } from "@material-tailwind/react";
-import { PROFILE } from "../Icons";
+import { PROFILE } from "./Icons";
 
 export default function Footer() {
   return (
