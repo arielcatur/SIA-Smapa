@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/SMA__4_SAMARINDA.png"
+import logo from "../assets/SMA__4_SAMARINDA.png";
 import {
   Card,
   Typography,
@@ -22,6 +22,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { BOOK, HOME, INFO } from "./Icons";
+import { Link } from "react-router-dom";
 
 export default function Sidebar() {
   const [open, setOpen] = React.useState(0);
@@ -31,20 +32,26 @@ export default function Sidebar() {
   };
 
   return (
-    <Card className="absolute inset-y-0 left-0 top-0 z-30 w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+    <Card className="absolute h-full inset-y-0 left-0 top-0 z-30 w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
       <div className="mb-2 p-4">
-        <Typography className="flex justify-start" variant="h5" color="blue-gray">
-            <img src={logo} alt="logo smapa" className="max-w-8 mx-2" />
-            <p className="mx-2 mt-1">SMAPA</p>
+        <Typography
+          className="flex justify-start"
+          variant="h5"
+          color="blue-gray"
+        >
+          <img src={logo} alt="logo smapa" className="max-w-8 mx-2" />
+          <p className="mx-2 mt-1">SMAPA</p>
         </Typography>
       </div>
       <List>
-        <ListItem>
-          <ListItemPrefix>
-            <HOME className="h-5 w-5"/>
-          </ListItemPrefix>
-          Beranda
-        </ListItem>
+        <Link to={"/homesiswa"}>
+          <ListItem>
+            <ListItemPrefix>
+              <HOME className="h-5 w-5" />
+            </ListItemPrefix>
+            Beranda
+          </ListItem>
+        </Link>
 
         <Accordion
           open={open === 1}
@@ -63,7 +70,7 @@ export default function Sidebar() {
               className="border-b-0 p-3"
             >
               <ListItemPrefix>
-                <INFO/>
+                <INFO />
               </ListItemPrefix>
               <Typography color="blue-gray" className="mr-auto font-normal">
                 Info Akademik
@@ -72,12 +79,12 @@ export default function Sidebar() {
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0 pl-8">
-              <ListItem>
-                Jadwal Pelajaran
-              </ListItem>
-              <ListItem>
-                Daftar Guru
-              </ListItem>
+              <Link to={"/jadwalpelajaran"}>
+                <ListItem>Jadwal Pelajaran</ListItem>
+              </Link>
+              <Link to={"/daftarguru"}>
+                <ListItem>Daftar Guru</ListItem>
+              </Link>
             </List>
           </AccordionBody>
         </Accordion>
@@ -98,7 +105,7 @@ export default function Sidebar() {
               className="border-b-0 p-3"
             >
               <ListItemPrefix>
-                <BOOK/>
+                <BOOK />
               </ListItemPrefix>
               <Typography color="blue-gray" className="mr-auto font-normal">
                 Nilai
@@ -107,15 +114,23 @@ export default function Sidebar() {
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0 pl-8">
-              <ListItem>
-                Nilai UTS
-              </ListItem>
-              <ListItem>
-                Nilai UAS
-              </ListItem>
+              <Link to={"/nilaiuts"}>
+                <ListItem>Nilai UTS</ListItem>
+              </Link>
+              <Link to={"/nilaiuas"}>
+                <ListItem>Nilai UAS</ListItem>
+              </Link>
             </List>
           </AccordionBody>
         </Accordion>
+        <Link to="/">
+          <ListItem>
+            <ListItemPrefix>
+              <PowerIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Log Out
+          </ListItem>
+        </Link>
       </List>
     </Card>
   );
