@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/SMA__4_SAMARINDA.png";
+import logo from "../assets/SMA__4_SAMARINDA2.png";
 import {
   Card,
   Typography,
@@ -32,22 +32,22 @@ export default function Sidebar() {
   };
 
   return (
-    <Card className="absolute h-full inset-y-0 left-0 top-0 z-30 w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
-      <div className="mb-2 p-4">
+    <Card className="border-r rounded-none bg-blue-400 absolute h-full inset-y-0 left-0 top-0 z-30 w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+      <div className="mb-2 pl-4 pb-4">
         <Typography
           className="flex justify-start"
           variant="h5"
           color="blue-gray"
         >
-          <img src={logo} alt="logo smapa" className="max-w-8 mx-2" />
-          <p className="mx-2 mt-1">SMAPA</p>
+          <img src={logo} alt="logo smapa" className="w-14" />
+          <p className="mx-2 mt-4 ml-4 text-white">SMAPA</p>
         </Typography>
       </div>
       <List>
         <Link to={"/homesiswa"}>
-          <ListItem>
+          <ListItem className="text-white hover:text-white active:text-white focus:text-white">
             <ListItemPrefix>
-              <HOME className="h-5 w-5" />
+              <HOME className="h-5 w-5"/>
             </ListItemPrefix>
             Beranda
           </ListItem>
@@ -57,6 +57,7 @@ export default function Sidebar() {
           open={open === 1}
           icon={
             <ChevronDownIcon
+              stroke="white"
               strokeWidth={2.5}
               className={`mx-auto h-4 w-4 transition-transform ${
                 open === 1 ? "rotate-180" : ""
@@ -72,18 +73,21 @@ export default function Sidebar() {
               <ListItemPrefix>
                 <INFO />
               </ListItemPrefix>
-              <Typography color="blue-gray" className="mr-auto font-normal">
+              <Typography
+                color="blue-gray"
+                className="text-white mr-auto font-normal"
+              >
                 Info Akademik
               </Typography>
             </AccordionHeader>
           </ListItem>
-          <AccordionBody className="py-1">
-            <List className="p-0 pl-8">
+          <AccordionBody className="py-1 ">
+            <List className="p-0 pl-8 text-white">
               <Link to={"/jadwalpelajaran"}>
-                <ListItem>Jadwal Pelajaran</ListItem>
+                <ListItem className="hover:text-white active:text-white focus:text-white">Jadwal Pelajaran</ListItem>
               </Link>
               <Link to={"/daftarguru"}>
-                <ListItem>Daftar Guru</ListItem>
+                <ListItem className="hover:text-white active:text-white focus:text-white">Daftar Guru</ListItem>
               </Link>
             </List>
           </AccordionBody>
@@ -92,6 +96,7 @@ export default function Sidebar() {
           open={open === 2}
           icon={
             <ChevronDownIcon
+              stroke="white"
               strokeWidth={2.5}
               className={`mx-auto h-4 w-4 transition-transform ${
                 open === 2 ? "rotate-180" : ""
@@ -107,26 +112,29 @@ export default function Sidebar() {
               <ListItemPrefix>
                 <BOOK />
               </ListItemPrefix>
-              <Typography color="blue-gray" className="mr-auto font-normal">
+              <Typography
+                color="blue-gray"
+                className="text-white mr-auto font-normal"
+              >
                 Nilai
               </Typography>
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
-            <List className="p-0 pl-8">
+            <List className="text-white p-0 pl-8">
               <Link to={"/nilaiuts"}>
-                <ListItem>Nilai UTS</ListItem>
+                <ListItem className="hover:text-white active:text-white focus:text-white">Nilai UTS</ListItem>
               </Link>
               <Link to={"/nilaiuas"}>
-                <ListItem>Nilai UAS</ListItem>
+                <ListItem className="hover:text-white active:text-white focus:text-white">Nilai UAS</ListItem>
               </Link>
             </List>
           </AccordionBody>
         </Accordion>
         <Link to="/">
-          <ListItem>
+          <ListItem className="text-white hover:text-white active:text-white focus:text-white">
             <ListItemPrefix>
-              <PowerIcon className="h-5 w-5" />
+              <PowerIcon className="text-white h-5 w-5" />
             </ListItemPrefix>
             Log Out
           </ListItem>

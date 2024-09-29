@@ -2,7 +2,7 @@ export default function ProfileSiswa() {
   return (
     <>
       <div className="ml-96 pl-32 mt-2">
-        <div className="block max-w-3xl px-6 pt-6 pb-2 bg-white border border-gray-200  shadow">
+        <div className="block max-w-3xl px-6 pt-6 bg-white border border-gray-200  shadow">
           <p className="pb-2 font-bold text-xl">Profile</p>
           <div className="flex justify-start">
             <img
@@ -145,7 +145,7 @@ export default function ProfileSiswa() {
                 type="button"
                 className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
               >
-                Cancel
+                Batal
               </button>
               <button
                 type="button"
