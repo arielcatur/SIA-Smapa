@@ -5,10 +5,14 @@ import Sidebar from "../Sidebar";
 export default function Siswa(props) {
   return (
     <>
-      <Navbar />
-      <Sidebar />
-      {props.children}
-      <Footer />
+      <div id="root">
+        <div className="main-content">
+          <Navbar />
+          <Sidebar />
+          {props.children}
+        </div>
+        <Footer />
+      </div>
     </>
   );
 }

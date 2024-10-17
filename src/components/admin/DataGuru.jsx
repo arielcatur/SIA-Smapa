@@ -1,19 +1,20 @@
 import { Card, Typography } from "@material-tailwind/react";
-import Search from "../Search";
+import { Link } from "react-router-dom";
+import { PLUS } from "../Icons";
 import axios from "axios";
 import Cookies from "js-cookie";
-import React, { useContext, useEffect, useState } from "react";
-
+import React, { useEffect, useState } from "react";
 const TABLE_HEAD = [
-  "No",
+  "Id Guru",
   "Nama",
-  "Agama",
   "NIP",
+  "Agama",
   "Jenis Kelamin",
   "Tempat Tanggal Lahir",
+  "Action",
 ];
 
-export function DaftarGuru() {
+export function DataGuru() {
   let config = {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
@@ -28,11 +29,9 @@ export function DaftarGuru() {
   useEffect(() => {
     if (fetchStatus === true) {
       axios
-        .get("http://localhost:3000/api/siswa/daftar-guru", config)
+        .get("http://localhost:3000/api/admin/guru", config)
         .then((res) => {
-          console.log(res.data.data);
           setData([...res.data.data]);
-          // console.log(data)
         })
         .catch((error) => {});
       setFetchStatus(false);
@@ -59,20 +58,40 @@ export function DaftarGuru() {
     }
   };
 
+  const handleDelete = (event) => {
+    let idData = parseInt(event.target.value);
+
+    axios
+      .delete(`http://localhost:3000/api/admin/guru/${idData}`, config)
+      .then((res) => {
+        setFetchStatus(true);
+      });
+  };
+
   return (
     <>
       <div className="ml-80 py-4">
         <p className="flex justify-center font-bold text-xl">Daftar Guru</p>
         <div className="mx-4 flex justify-between">
           <p className="pt-2 font-semibold text-base">Daftar Guru</p>
-          {/* <Search /> */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border h-[37.6px] border-gray-300 p-2"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="grid grid-cols-[auto_auto] gap-2">
+            <input
+              type="text"
+              placeholder="Cari Nama Guru..."
+              className="border h-[37.6px] border-gray-300 p-2"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Link to={"/tambahguru"} className="">
+              <button
+                type="submit"
+                className="w-[40px] h-[37.6px] text-white bg-blue-400 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-200 font-medium"
+              >
+                <PLUS />
+              </button>
+              {/* <Plus /> */}
+            </Link>
+          </div>
         </div>
       </div>
       <Card className="h-full ml-80 rounded-none">
@@ -95,74 +114,6 @@ export function DaftarGuru() {
               ))}
             </tr>
           </thead>
-          {/* <tbody>
-            {data !== null &&
-              data.map((res, index) => {
-                const isLast = index === res.id.length - 1;
-                const classes = isLast
-                  ? "p-4"
-                  : "p-4 border-b border-blue-gray-50";
-
-                return (
-                  <tr key={res.id}>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {index + 1}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.nama}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.agama}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.nig}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.jk}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.ttl}
-                      </Typography>
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody> */}
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((res, index) => (
@@ -173,7 +124,7 @@ export function DaftarGuru() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {indexOfFirstData + index + 1}
+                      {res.id}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
@@ -191,7 +142,7 @@ export function DaftarGuru() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {res.agama}
+                      {res.nig}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
@@ -200,7 +151,7 @@ export function DaftarGuru() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {res.nig}
+                      {res.agama}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
@@ -221,6 +172,14 @@ export function DaftarGuru() {
                       {res.ttl}
                     </Typography>
                   </td>
+                  <td className="grid grid-cols-2 text-white p-4 border-b border-blue-gray-50">
+                    <button className="bg-blue-300 border border-white h-8 hover:bg-blue-400">
+                      Edit
+                    </button>
+                    <button className="bg-red-300 border border-white h-8 hover:bg-red-400">
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
@@ -238,6 +197,23 @@ export function DaftarGuru() {
             )}
           </tbody>
         </table>
+        <div className="flex justify-end p-4">
+          <button
+            onClick={handlePreviousPage}
+            className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+          >
+            Previous
+          </button>
+          <div className="border w-8 bg-blue-gray-200 border-blue-gray-200 text-white text-center pt-2">
+            {currentPage}
+          </div>
+          <button
+            onClick={handleNextPage}
+            className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+          >
+            Next
+          </button>
+        </div>
       </Card>
     </>
   );

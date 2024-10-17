@@ -1,6 +1,5 @@
 import { Card, Typography } from "@material-tailwind/react";
-import Cookies from "js-cookie";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,31 +7,33 @@ import {
   CardFooter,
   Input,
 } from "@material-tailwind/react";
+import Cookies from "js-cookie";
 import axios from "axios";
-import { Link } from "react-router-dom";
-const TABLE_HEAD = ["Id Kelas", "Nama Kelas", "Absen", "Action"];
+const TABLE_HEAD = ["Id Matpel", "Mata Pelajaran", "Action"];
 
-export function TambahDataKelas() {
+export function DataMataPelajaran() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen((cur) => !cur);
   let config = {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
-  const [dataKelas, setDataKelas] = useState(null);
-  const [open, setOpen] = React.useState(false);
+  const [dataMatpel, setDataMatpel] = useState(null);
   const [input, setInput] = useState({
     nama: "",
   });
+  //indikator
   const [fetchStatus, setFetchStatus] = useState(true);
   const [currentId, setCurrentId] = useState(-1);
-  const handleOpen = () => setOpen((cur) => !cur);
 
   useEffect(() => {
     if (fetchStatus === true) {
       axios
-        .get("http://localhost:3000/api/admin/kelas", config)
+        .get("http://localhost:3000/api/admin/matpel", config)
         .then((res) => {
-          setDataKelas([...res.data.data]);
+          // console.log(res.data.data);
+          setDataMatpel([...res.data.data]);
         })
         .catch((error) => {});
       setFetchStatus(false);
@@ -47,10 +48,11 @@ export function TambahDataKelas() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     let { nama } = input;
     if (currentId === -1) {
       axios
-        .post("http://localhost:3000/api/admin/kelas", { nama }, config)
+        .post("http://localhost:3000/api/admin/matpel", { nama }, config)
         .then((res) => {
           console.log(res);
           setFetchStatus(true);
@@ -58,7 +60,7 @@ export function TambahDataKelas() {
     } else {
       axios
         .post(
-          `http://localhost:3000/api/admin/kelas/${currentId}`,
+          `http://localhost:3000/api/admin/matpel/${currentId}`,
           { nama },
           config
         )
@@ -68,6 +70,7 @@ export function TambahDataKelas() {
         });
     }
     setCurrentId(-1);
+    // clear input setelah create data
     setInput({
       nama: "",
     });
@@ -77,7 +80,7 @@ export function TambahDataKelas() {
     let idData = parseInt(event.target.value);
 
     axios
-      .delete(`http://localhost:3000/api/admin/kelas/${idData}`, config)
+      .delete(`http://localhost:3000/api/admin/matpel/${idData}`, config)
       .then((res) => {
         setFetchStatus(true);
       });
@@ -92,7 +95,9 @@ export function TambahDataKelas() {
   return (
     <>
       <div className="ml-80 py-4">
-        <p className="flex justify-center font-bold text-xl">Data Kelas</p>
+        <p className="flex justify-center font-bold text-xl">
+          Data Mata Pelajaran
+        </p>
       </div>
       <div className="grid grid-rows-[auto_auto] justify-center ml-80">
         <div className="my-2 justify-self-end">
@@ -100,10 +105,10 @@ export function TambahDataKelas() {
             onClick={handleOpen}
             className="border border-blue-gray-300 py-1 px-2 bg-blue-gray-300 text-white hover:bg-white hover:text-blue-gray-300"
           >
-            Tambah Kelas
+            Tambah mata pelajaran
           </button>
         </div>
-        <Card className="h-full w-[650px] rounded-none">
+        <Card className="h-full w-[550px] rounded-none">
           <table className="w-full min-w-max table-auto text-center">
             <thead>
               <tr>
@@ -124,8 +129,8 @@ export function TambahDataKelas() {
               </tr>
             </thead>
             <tbody>
-              {dataKelas !== null &&
-                dataKelas.map((res, index) => {
+              {dataMatpel !== null &&
+                dataMatpel.map((res, index) => {
                   const isLast = index === res.id.length - 1;
                   const classes = isLast
                     ? "p-4 border-b border-blue-gray-50"
@@ -151,25 +156,18 @@ export function TambahDataKelas() {
                           {res.nama}
                         </Typography>
                       </td>
-                      <td className=" text-white  p-4 border-b border-blue-gray-50">
-                        <Link to={'/absenbyadmin'}>
-                          <button className="bg-blue-300 px-2 border border-white h-8 hover:bg-blue-400">
-                            Absen
-                          </button>
-                        </Link>
-                      </td>
                       <td className="grid grid-cols-2 text-white  p-4 border-b border-blue-gray-50">
                         <button
                           onClick={handleEdit}
                           value={res.id}
-                          className="bg-blue-300 border border-white h-8 hover:bg-blue-400"
+                          className=" bg-blue-300 border border-white h-8 hover:bg-blue-400"
                         >
                           Edit
                         </button>
                         <button
                           onClick={handleDelete}
                           value={res.id}
-                          className="bg-red-300 border border-white h-8 hover:bg-red-400"
+                          className=" bg-red-300 border border-white h-8 hover:bg-red-400"
                         >
                           Delete
                         </button>
@@ -192,6 +190,8 @@ export function TambahDataKelas() {
           </div>
         </Card>
       </div>
+      {/* <Button onClick={handleOpen} className=" ml-80">Sign In</Button> */}
+      {/* modal */}
       <Dialog
         size="xs"
         open={open}
@@ -202,26 +202,22 @@ export function TambahDataKelas() {
           <Card className="mx-auto w-full max-w-[24rem]">
             <CardBody className="flex flex-col gap-4">
               <Typography variant="h4" color="blue-gray">
-                Tambah Kelas
+                Tambah Mata Pelajaran
               </Typography>
               <Typography className="-mb-2" variant="h6">
-                Nama Kelas
+                Nama Mata Pelajaran
               </Typography>
               <Input
                 onChange={handleInput}
                 value={input.nama}
+                // type={"submit"}
                 name="nama"
-                label="Nama Kelas"
+                label="Nama Mata Pelajaran"
                 size="lg"
               />
             </CardBody>
             <CardFooter className="pt-0">
-              <Button
-                type={"submit"}
-                variant="gradient"
-                onClick={handleOpen}
-                fullWidth
-              >
+              <Button type={"submit"} variant="gradient" onClick={handleOpen} fullWidth>
                 Simpan
               </Button>
             </CardFooter>

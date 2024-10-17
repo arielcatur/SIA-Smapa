@@ -1,15 +1,15 @@
 import Footer from "../Footer";
+import SidebarGuru from "../guru/SidebarGuru";
 import Navbar from "../Navbar";
-import Sidebar from "../Sidebar";
-import SidebarWali from "../wali/SidebarWali";
+// import SidebarGuru from "../SidebarGuru";
 
-export default function WaliMurid(props) {
+export default function Guru(props) {
   return (
     <>
       <div id="root">
         <div className="main-content">
           <Navbar />
-          <SidebarWali />
+          <SidebarGuru />
           {props.children}
         </div>
         <Footer />

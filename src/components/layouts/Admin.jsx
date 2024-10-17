@@ -1,15 +1,14 @@
+import SidebarAdmin from "../admin/SidebarAdmin";
 import Footer from "../Footer";
 import Navbar from "../Navbar";
-import Sidebar from "../Sidebar";
-import SidebarWali from "../wali/SidebarWali";
 
-export default function WaliMurid(props) {
+export default function Admin(props) {
   return (
     <>
       <div id="root">
         <div className="main-content">
           <Navbar />
-          <SidebarWali />
+          <SidebarAdmin />
           {props.children}
         </div>
         <Footer />

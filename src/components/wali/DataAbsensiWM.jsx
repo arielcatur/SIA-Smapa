@@ -1,12 +1,7 @@
 import { Card, Typography } from "@material-tailwind/react";
 import DropDown from "../DropDown";
 
-const TABLE_HEAD = [
-  "No",
-  "Tanggal",
-  "Hari",
-  "Keterangan",
-];
+const TABLE_HEAD = ["No", "Tanggal", "Hari", "Keterangan"];
 
 const TABLE_ROWS = [
   {
@@ -34,22 +29,43 @@ const TABLE_ROWS = [
     hari: "Senin",
     keterangan: "hadir",
   },
-  
 ];
+import axios from "axios";
+import Cookies from "js-cookie";
+import React, { useContext, useEffect, useState } from "react";
 
 export function DataAbsensiWM() {
+  let config = {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  };
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
+  // const [fetchStatus, setFetchStatus] = useState(true);
+  useEffect(() => {
+    // Memanggil API untuk mendapatkan data jadwal
+    axios
+      .get("http://localhost:3000/api/wali-murid/absensi", config)
+      .then((res) => {
+        setData(res.data.data); // Simpan semua data jadwal
+      })
+      .catch((error) => {
+        console.error("Error fetching jadwal:", error);
+        setError("Gagal mengambil data jadwal.");
+      });
+  }, []);
+
   return (
     <>
       <div className="ml-80 py-4">
-        <p className="flex justify-center font-bold text-xl">
-          Data Absensi
-        </p>
+        <p className="flex justify-center font-bold text-xl">Data Absensi</p>
         <div className="mx-4 flex justify-between">
-            <p className="pt-2 font-semibold text-base">Data Absensi</p>
-            <DropDown/>
+          <p className="pt-2 font-semibold text-base">Data Absensi</p>
+          <DropDown />
         </div>
       </div>
-      <Card className="h-full ml-80">
+      <Card className="h-full ml-80 rounded-none">
         <table className="w-full min-w-max table-auto text-center">
           <thead>
             <tr>
@@ -70,14 +86,15 @@ export function DataAbsensiWM() {
             </tr>
           </thead>
           <tbody>
-            {TABLE_ROWS.map(({ tanggal, hari, keterangan }, index) => {
-              const isLast = index === TABLE_ROWS.length - 1;
+          {data !== null &&
+                data.map((res, index) => {
+              const isLast = index === res.id.length - 1;
               const classes = isLast
                 ? "p-4"
                 : "p-4 border-b border-blue-gray-50";
 
               return (
-                <tr key={tanggal}>
+                <tr key={res.id}>
                   <td className={classes}>
                     <Typography
                       variant="small"
@@ -93,7 +110,7 @@ export function DataAbsensiWM() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {tanggal}
+                      {res.tglAbsen}
                     </Typography>
                   </td>
                   <td className={classes}>
@@ -102,7 +119,7 @@ export function DataAbsensiWM() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {hari}
+                      {res.hariAbsen}
                     </Typography>
                   </td>
                   <td className={classes}>
@@ -111,7 +128,7 @@ export function DataAbsensiWM() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {keterangan}
+                      {res.keterangan}
                     </Typography>
                   </td>
                 </tr>

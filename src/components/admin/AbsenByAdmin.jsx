@@ -1,8 +1,4 @@
 import { Card, Typography } from "@material-tailwind/react";
-import Search from "../Search";
-import DropDown from "../DropDown";
-import Plus from "../Plus";
-import { PLUS } from "../Icons";
 import React from "react";
 import {
   Button,
@@ -10,9 +6,8 @@ import {
   CardBody,
   CardFooter,
   Input,
-  Checkbox,
 } from "@material-tailwind/react";
-const TABLE_HEAD = ["Kelas", "NIS", "Absen"];
+const TABLE_HEAD = ["Nama", "NIS", "Absen"];
 
 const TABLE_ROWS = [
   {
@@ -59,7 +54,7 @@ export function AbsenByAdmin() {
         <div className="my-2 justify-self-end">
           <p>Kelas XI 1</p>
         </div>
-        <Card className="h-full w-[650px] rounded-none">
+        <Card className="h-full w-[750px] rounded-none">
           <table className="w-full min-w-max table-auto text-center">
             <thead>
               <tr>
@@ -94,7 +89,7 @@ export function AbsenByAdmin() {
                         color="blue-gray"
                         className="font-normal"
                       >
-                        {kelas}
+                        {name}
                       </Typography>
                     </td>
                     <td className={classes}>
@@ -106,8 +101,8 @@ export function AbsenByAdmin() {
                         {nis}
                       </Typography>
                     </td>
-                    <td className="border-b border-blue-gray-50">
-                      {/* <div className="flex gap-5">
+                    <td className="border-b border-blue-gray-50 max-w-[180px]">
+                      <div className="flex gap-2">
                         <div className="inline-flex items-center">
                           <label
                             className="relative flex items-center cursor-pointer"
@@ -125,7 +120,7 @@ export function AbsenByAdmin() {
                             className="ml-2 text-slate-600 cursor-pointer text-sm"
                             htmlFor="html"
                           >
-                            HTML
+                            Hadir
                           </label>
                         </div>
                         <div className="inline-flex items-center">
@@ -146,7 +141,7 @@ export function AbsenByAdmin() {
                             className="ml-2 text-slate-600 cursor-pointer text-sm"
                             htmlFor="react"
                           >
-                            React
+                            Izin
                           </label>
                         </div>
                         <div className="inline-flex items-center">
@@ -167,7 +162,7 @@ export function AbsenByAdmin() {
                             className="ml-2 text-slate-600 cursor-pointer text-sm"
                             htmlFor="react"
                           >
-                            React
+                            Sakit
                           </label>
                         </div>
                         <div className="inline-flex items-center">
@@ -188,50 +183,7 @@ export function AbsenByAdmin() {
                             className="ml-2 text-slate-600 cursor-pointer text-sm"
                             htmlFor="react"
                           >
-                            React
-                          </label>
-                        </div>
-                      </div> */}
-                      <div className="flex gap-10">
-                        <div className="inline-flex items-center">
-                          <label
-                            className="relative flex items-center cursor-pointer"
-                            htmlFor="html"
-                          >
-                            <input
-                              name="framework"
-                              type="radio"
-                              className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all"
-                              id="html"
-                            />
-                            <span className="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
-                          </label>
-                          <label
-                            className="ml-2 text-slate-600 cursor-pointer text-sm"
-                            htmlFor="html"
-                          >
-                            HTML
-                          </label>
-                        </div>
-                        <div className="inline-flex items-center">
-                          <label
-                            className="relative flex items-center cursor-pointer"
-                            htmlFor="react"
-                          >
-                            <input
-                              name="framework"
-                              type="radio"
-                              className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all"
-                              id="react"
-                              defaultChecked
-                            />
-                            <span className="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
-                          </label>
-                          <label
-                            className="ml-2 text-slate-600 cursor-pointer text-sm"
-                            htmlFor="react"
-                          >
-                            React
+                            Tidak Hadir
                           </label>
                         </div>
                       </div>
@@ -254,7 +206,6 @@ export function AbsenByAdmin() {
           </div>
         </Card>
       </div>
-      {/* <Button onClick={handleOpen} className=" ml-80">Sign In</Button> */}
       {/* modal */}
       <Dialog
         size="xs"

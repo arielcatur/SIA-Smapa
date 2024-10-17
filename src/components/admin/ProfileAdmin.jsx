@@ -2,19 +2,15 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import defaultProfile from "../../assets/ariel.jpeg";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2'
 
-export default function ProfileSiswa() {
+export default function ProfileAdmin() {
   let config = {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
   const [formData, setFormData] = useState({
-    nis: "",
-    kelasId: "",
-    // kelasNama: "",
-    semester: "",
     nama: "",
     ttl: "",
     jk: "",
@@ -24,24 +20,22 @@ export default function ProfileSiswa() {
     foto: "",
   });
   const [file, setFile] = useState(null);
-  const [foto, setFoto] = useState(defaultProfile); // Menampilkan foto default
+  const [foto, setFoto] = useState(defaultProfile);
   const [fetchStatus, setFetchStatus] = useState(true);
 
   useEffect(() => {
     if (fetchStatus === true) {
       axios
-        .get("http://localhost:3000/api/siswa/profile", config)
+        .get("http://localhost:3000/api/admin/profile", config)
         .then((res) => {
           // console.log(res.data.data);
           const data = res.data.data;
+          console.log("Jenis Kelamin dari API:", data.jk);
           setFormData({
-            nis: data.nis || "",
-            kelasId: data.kelas.id ? data.kelas.id.toString() : "",
-            kelasNama: data.kelas.nama || "",
-            semester: data.semester || "",
             nama: data.nama || "",
             ttl: data.ttl || "",
-            jk: data.jk || "",
+            // jk: data.jk || "",
+            jk: data.jk === "laki laki" ? "Laki-laki" : data.jk === "P" ? "Perempuan" : "",
             agama: data.agama || "",
             noTelp: data.noTelp || "",
             alamat: data.alamat || "",
@@ -55,6 +49,7 @@ export default function ProfileSiswa() {
   }, [fetchStatus, setFetchStatus]);
 
   const handleChange = (e) => {
+    // const { name, value } = e.target;
     let value = e.target.value;
     let name = e.target.name;
     setFormData({ ...formData, [name]: value });
@@ -63,7 +58,7 @@ export default function ProfileSiswa() {
   const uploadPhoto = async (selectedFile) => {
     const formDataPhoto = new FormData();
     formDataPhoto.append("foto", selectedFile);
-
+  
     try {
       const response = await axios.post(
         "http://localhost:3000/api/uploads",
@@ -75,12 +70,12 @@ export default function ProfileSiswa() {
           },
         }
       );
-
+  
       if (response.data.status) {
         setFoto(response.data.data.foto);
         setFormData((prevData) => ({
           ...prevData,
-          foto: response.data.data.foto,
+          foto: response.data.data.foto, 
         }));
         alert(response.data.message);
       } else {
@@ -94,7 +89,7 @@ export default function ProfileSiswa() {
       alert("Terjadi kesalahan saat mengupload foto.");
     }
   };
-
+  
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -102,14 +97,14 @@ export default function ProfileSiswa() {
       uploadPhoto(selectedFile);
     }
   };
-
+  
   const handleSubmit = (event) => {
     event.preventDefault();
-
+  
     const updatedFormData = {
-      nis: formData.nis || "",
-      kelasId: formData.kelasId ? parseInt(formData.kelasId) : "",
-      semester: formData.semester || "",
+      // nis: formData.nis || "", 
+      // kelasId: formData.kelasId ? parseInt(formData.kelasId) : "", 
+      // semester: formData.semester || "",
       nama: formData.nama || "",
       ttl: formData.ttl || "",
       jk: formData.jk || "",
@@ -118,23 +113,20 @@ export default function ProfileSiswa() {
       alamat: formData.alamat || "",
       foto: formData.foto || "",
     };
-
+  
     console.log(updatedFormData);
-
+  
     axios
-      .post(
-        "http://localhost:3000/api/siswa/profile/update",
-        updatedFormData,
-        config
-      )
+      .post("http://localhost:3000/api/admin/profile/update", updatedFormData, config)
       .then((res) => {
         console.log(res);
         setFetchStatus(true);
         Swal.fire({
+          // position: "top-end",
           icon: "success",
           title: "Sukses Menyimpan Data",
           showConfirmButton: false,
-          timer: 1500,
+          timer: 1500
         });
       })
       .catch((error) => {
@@ -152,7 +144,7 @@ export default function ProfileSiswa() {
   };
   return (
     <>
-      <div className="ml-96 pl-32 my-2">
+      <div className="ml-96 pl-32 mt-2 lg:mt-10">
         <form onSubmit={handleSubmit}>
           <div className="block max-w-3xl px-6 pt-6 bg-white border border-gray-200 shadow">
             <p className="pb-2 font-bold text-xl">Profile</p>
@@ -167,7 +159,7 @@ export default function ProfileSiswa() {
                 <img
                   src={foto}
                   alt="Uploaded"
-                  className="max-h-[170px] max-w-32"
+                  className="max-h-[170px] max-w-32 min-h-[170px] min-w-32"
                 />
               )}
             </div>
@@ -185,54 +177,6 @@ export default function ProfileSiswa() {
                     id="nama"
                     name="nama"
                     value={formData.nama}
-                    onChange={handleChange}
-                    className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="nis"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    NIS
-                  </label>
-                  <input
-                    type="text"
-                    id="nis"
-                    name="nis"
-                    value={formData.nis}
-                    onChange={handleChange}
-                    className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="kelasId"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Kelas
-                  </label>
-                  <input
-                    type="text"
-                    id="kelasId"
-                    name="kelasId"
-                    value={formData.kelasId}
-                    onChange={handleChange}
-                    className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="semester"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Semester
-                  </label>
-                  <input
-                    type="text"
-                    id="semester"
-                    name="semester"
-                    value={formData.semester}
                     onChange={handleChange}
                     className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
@@ -320,20 +264,20 @@ export default function ProfileSiswa() {
                     className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                 </div>
-                <div className="flex justify-end items-end">
-                  <button
-                    type="button"
-                    className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mt-2"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mt-2"
-                  >
-                    Simpan
-                  </button>
-                </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                >
+                  Simpan
+                </button>
               </div>
             </div>
           </div>

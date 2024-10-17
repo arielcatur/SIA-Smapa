@@ -1,10 +1,12 @@
 import { Card, Typography } from "@material-tailwind/react";
-import Search from "../Search";
-import DropDown from "../DropDown";
-import Plus from "../Plus";
+import { Link } from "react-router-dom";
+import { PLUS } from "../Icons";
+import axios from "axios";
+import Cookies from "js-cookie";
+import React, { useEffect, useState } from "react";
 
 const TABLE_HEAD = [
-  "No",
+  "Id Siswa",
   "Nama",
   "Kelas",
   "NIS",
@@ -13,40 +15,51 @@ const TABLE_HEAD = [
   "Action",
 ];
 
-const TABLE_ROWS = [
-  {
-    name: "John Michael",
-    kelas: "XI 1",
-    nis: "12345678910",
-    jk: "Perempuan",
-  },
-  {
-    name: "Alexa Liras",
-    kelas: "XI 1",
-    nis: "12345678910",
-    jk: "Perempuan",
-  },
-  {
-    name: "Laurent Perrier",
-    kelas: "XI 1",
-    nis: "12345678910",
-    jk: "Perempuan",
-  },
-  {
-    name: "Michael Levi",
-    kelas: "XI 1",
-    nis: "12345678910",
-    jk: "Perempuan",
-  },
-  {
-    name: "Richard Gran",
-    kelas: "XI 1",
-    nis: "12345678910",
-    jk: "Perempuan",
-  },
-];
-
 export function DataSiswa() {
+  const [data, setData] = useState([]);
+  const [fetchStatus, setFetchStatus] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const dataPerPage = 5;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  };
+
+  useEffect(() => {
+    if (fetchStatus === true) {
+      axios
+        .get("http://localhost:3000/api/admin/siswa", config)
+        .then((res) => {
+          setData(res.data.data);
+          setFetchStatus(false);
+        })
+        .catch((error) => {});
+    }
+  }, [fetchStatus]);
+
+  const filteredData = data.filter((item) =>
+    item.nama.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const indexOfLastData = currentPage * dataPerPage;
+  const indexOfFirstData = indexOfLastData - dataPerPage;
+  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(filteredData.length / dataPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <>
       <div className="ml-80 py-4">
@@ -54,8 +67,21 @@ export function DataSiswa() {
         <div className="mx-4 flex justify-between">
           <p className="pt-2 font-semibold text-base">Daftar Siswa</p>
           <div className="grid grid-cols-[auto_auto] gap-2">
-            <Search />
-            <Plus />
+            <input
+              type="text"
+              placeholder="Cari Nama Siswa..."
+              className="border h-[37.6px] border-gray-300 p-2"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Link to={"/tambahsiswa"}>
+              <button
+                type="submit"
+                className="w-[40px] h-[37.6px] text-white bg-blue-400 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-200 font-medium"
+              >
+                <PLUS />
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -80,69 +106,40 @@ export function DataSiswa() {
             </tr>
           </thead>
           <tbody>
-            {TABLE_ROWS.map(({ name, kelas, nis, jk }, index) => {
-              const isLast = index === TABLE_ROWS.length - 1;
-              const classes = isLast
-                ? "p-4 border-b border-blue-gray-50"
-                : "p-4 border-b border-blue-gray-50";
-
-              return (
-                <tr key={name}>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {index + 1}
+            {currentData.length > 0 ? (
+              currentData.map((res, index) => (
+                <tr key={res.id}>
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {res.id}
                     </Typography>
                   </td>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-semibold"
-                    >
-                      {name}
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                      {res.nama}
                     </Typography>
                   </td>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {kelas}
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {res.kelas.nama}
                     </Typography>
                   </td>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {nis}
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {res.nis}
                     </Typography>
                   </td>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {jk}
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {res.jk}
                     </Typography>
                   </td>
-                  <td className={classes}>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {nis}
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography variant="small" color="blue-gray" className="font-normal">
+                      {res.ttl}
                     </Typography>
                   </td>
-                  <td className="grid grid-cols-2 text-white  p-4 border-b border-blue-gray-50">
+                  <td className="grid grid-cols-2 text-white p-4 border-b border-blue-gray-50">
                     <button className="bg-blue-300 border border-white h-8 hover:bg-blue-400">
                       Edit
                     </button>
@@ -151,16 +148,32 @@ export function DataSiswa() {
                     </button>
                   </td>
                 </tr>
-              );
-            })}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={TABLE_HEAD.length} className="p-4">
+                  <Typography variant="small" color="blue-gray" className="font-normal">
+                    Tidak ada data yang ditemukan.
+                  </Typography>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
-        <div className="flex justify-end p-4 ">
-          <button className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+        <div className="flex justify-end p-4">
+          <button
+            onClick={handlePreviousPage}
+            className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+          >
             Previous
           </button>
-          <div className="border w-8 bg-blue-gray-200 border-blue-gray-200 text-white text-center pt-2">1</div>
-          <button className="border-4 w-20 h-10 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+          <div className="border w-8 bg-blue-gray-200 border-blue-gray-200 text-white text-center pt-2">
+            {currentPage}
+          </div>
+          <button
+            onClick={handleNextPage}
+            className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+          >
             Next
           </button>
         </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/SMA__4_SAMARINDA2.png";
+import logo from "../../assets/SMA__4_SAMARINDA2.png";
 import {
   Card,
   Typography,
@@ -13,11 +13,11 @@ import {
 import {
   PowerIcon,
 } from "@heroicons/react/24/solid";
-import {  ChevronDownIcon } from "@heroicons/react/24/outline";
-import { BOOK, HOME, INFO, KEY } from "./Icons";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { BOOK, HOME, INFO, KEY } from "../Icons";
 import { Link } from "react-router-dom";
 
-export default function Sidebar() {
+export default function SidebarGuru() {
   const [open, setOpen] = React.useState(0);
 
   const handleOpen = (value) => {
@@ -25,7 +25,7 @@ export default function Sidebar() {
   };
 
   return (
-    <Card className="fixed border-r rounded-none bg-blue-400 h-full inset-y-0 left-0 top-0 z-30 w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+    <Card className="border-r rounded-none bg-blue-400 absolute h-full inset-y-0 left-0 top-0 z-30 w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
       <div className="mb-2 pl-4 pb-4">
         <Typography
           className="flex justify-start"
@@ -37,14 +37,15 @@ export default function Sidebar() {
         </Typography>
       </div>
       <List>
-        <Link to={"/homesiswa"}>
+        <Link to={"/homeguru"}>
           <ListItem className="text-white hover:text-white active:text-white focus:text-white">
             <ListItemPrefix>
-              <HOME className="h-5 w-5"/>
+              <HOME className="h-5 w-5" />
             </ListItemPrefix>
             Beranda
           </ListItem>
         </Link>
+
         <Accordion
           open={open === 1}
           icon={
@@ -75,11 +76,15 @@ export default function Sidebar() {
           </ListItem>
           <AccordionBody className="py-1 ">
             <List className="p-0 pl-8 text-white">
-              <Link to={"/jadwalpelajaran"}>
-                <ListItem className="hover:text-white active:text-white focus:text-white">Jadwal Pelajaran</ListItem>
+              <Link to={"/jadwalmengajarguru"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Jadwal Mengajar
+                </ListItem>
               </Link>
-              <Link to={"/daftarguru"}>
-                <ListItem className="hover:text-white active:text-white focus:text-white">Daftar Guru</ListItem>
+              <Link to={"/daftarsiswa"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Daftar Siswa
+                </ListItem>
               </Link>
             </List>
           </AccordionBody>
@@ -114,11 +119,15 @@ export default function Sidebar() {
           </ListItem>
           <AccordionBody className="py-1">
             <List className="text-white p-0 pl-8">
-              <Link to={"/nilaiuts"}>
-                <ListItem className="hover:text-white active:text-white focus:text-white">Nilai UTS</ListItem>
+              <Link to={"/inputnilaiuts"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Nilai UTS
+                </ListItem>
               </Link>
-              <Link to={"/nilaiuas"}>
-                <ListItem className="hover:text-white active:text-white focus:text-white">Nilai UAS</ListItem>
+              <Link to={"/inputnilaiuts"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Nilai UAS
+                </ListItem>
               </Link>
             </List>
           </AccordionBody>
@@ -126,7 +135,7 @@ export default function Sidebar() {
         <Link to={"/changepass"}>
           <ListItem className="text-white hover:text-white active:text-white focus:text-white">
             <ListItemPrefix>
-              <KEY className="h-5 w-5"/>
+              <KEY className="h-5 w-5" />
             </ListItemPrefix>
             Ganti Password
           </ListItem>

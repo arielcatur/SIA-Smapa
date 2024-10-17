@@ -5,9 +5,33 @@ import {
   Typography,
   Button,
 } from "@material-tailwind/react";
-import { ARROWRIGHT } from "../Icons";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 export function NilaiUTS() {
+  let config = {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  };
+
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Memanggil API untuk mendapatkan data jadwal
+    axios
+      .get("http://localhost:3000/api/siswa/nilai-uts", config)
+      .then((res) => {
+        setData(res.data.data); // Simpan semua data jadwal
+      })
+      .catch((error) => {
+        console.error("Error fetching jadwal:", error);
+        setError("Gagal mengambil data jadwal.");
+      });
+  }, []);
+
   return (
     <>
       <div className="ml-80 py-4">
@@ -19,26 +43,22 @@ export function NilaiUTS() {
               Senin
             </Typography>
           </CardBody> */}
-        <CardFooter>
-          <div className="flex justify-between p-2 border-black border-2">
-            <div>Fisika</div>
-            <div className="bg-cyan-400 px-2 rounded-full text-white">80</div>
-          </div>
-          <div className="flex justify-between p-2 border-black border-2">
-            <div>Fisika</div>
-            <div className="bg-cyan-400 px-2 rounded-full text-white">80</div>
-          </div>
-          <div className="flex justify-between p-2 border-black border-2">
-            <div>Fisika</div>
-            <div className="bg-cyan-400 px-2 rounded-full text-white">80</div>
-          </div>
-          <div className="flex justify-between p-2 border-black border-2">
-            <div className="mt-1">Fisika</div>
-            <button className="bg-black w-8 h-8 border-4 border-black ">
-              <ARROWRIGHT/>
-            </button>
-          </div>
-        </CardFooter>
+        {data.length > 0 ? (
+          data.map((res) => (
+            <CardFooter>
+              <div className="flex justify-between p-2 border-black border-2">
+                <div>{res.mataPelajaran.nama}</div>
+                <div className="bg-cyan-400 px-2 rounded-full text-white">
+                  {res.nilai}
+                </div>
+              </div>
+            </CardFooter>
+          ))
+        ) : (
+          <CardFooter className="p-4">
+            <div className="text-center text-gray-500">Tidak Nilai</div>
+          </CardFooter>
+        )}
       </Card>
     </>
   );

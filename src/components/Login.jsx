@@ -1,15 +1,44 @@
 import { Link } from "react-router-dom";
 import Select from "./Select";
+import SelectDefault from "./Select";
+import { GlobalContext } from "../context/GlobalContext";
+import { useContext } from "react";
 
 export default function Login() {
+  const { state, handleFunction } = useContext(GlobalContext);
+  const { input } = state;
+  const { handleChange, handleLogin } = handleFunction;
+  const options = [
+    {
+      label: "Pilih Role",
+      value: "",
+    },
+    {
+      label: "Siswa",
+      value: "siswa",
+    },
+    {
+      label: "Wali Murid",
+      value: "wali murid",
+    },
+    {
+      label: "Guru",
+      value: "guru",
+    },
+    {
+      label: "Admin",
+      value: "admin",
+    },
+  ];
+
   return (
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <div class="flex flex-col items-center w-full justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
       <div class="w-full bg-white rounded-xl shadow md:mt-0 sm:max-w-md xl:p-0 ">
         <div class="bg-white shadow-xl rounded-xl p-6 space-y-4 md:space-y-6 sm:p-8">
           <div class="flex justify-center">
             <h1 class="text-4xl font-bold text-black-900">Login</h1>
           </div>
-          <form class="space-y-4 md:space-y-6">
+          <form onSubmit={handleLogin} class="space-y-4 md:space-y-6">
             <div>
               <label
                 for="email"
@@ -18,10 +47,12 @@ export default function Login() {
                 Username
               </label>
               <input
-                type="email"
-                name="email"
-                id="email"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                onChange={handleChange}
+                value={input.username}
+                type="text"
+                name="username"
+                // id="email"
+                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 placeholder="Enter your username"
               />
             </div>
@@ -33,18 +64,27 @@ export default function Login() {
                 Password
               </label>
               <input
+                onChange={handleChange}
+                value={input.password}
                 type="password"
                 name="password"
-                id="password"
                 placeholder="Enter your password"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               />
             </div>
             <div>
               <label class="flex mb-2 text-sm font-medium text-black-900">
                 Role
               </label>
-              <Select />
+              <select
+              className="border-2 border-gray-300 p-1 rounded"
+              value={input.role} 
+              onChange={handleChange} 
+              name="role">
+                {options.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
             </div>
             <button
               type={"submit"}
@@ -52,15 +92,6 @@ export default function Login() {
             >
               Login
             </button>
-            <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-              Don’t have an account yet?{" "}
-              <Link
-                to={"/homesiswa"}
-                className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-              >
-                Sign up
-              </Link>
-            </p>
           </form>
         </div>
       </div>
