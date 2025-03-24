@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import defaultProfile from "../../assets/ariel.jpeg";
+import Swal from "sweetalert2";
+
+const defaultProfile = "http://localhost:3000/uploads/1732526553714.jpg";
 
 export default function TambahSiswa() {
+  let config = {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  };
   const [formData, setFormData] = useState({
     nis: "",
     username: "",
@@ -20,6 +27,18 @@ export default function TambahSiswa() {
   });
   const [file, setFile] = useState(null);
   const [foto, setFoto] = useState(defaultProfile);
+  const [kelas, setKelas] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/admin/kelas", config).then((res) => {
+      setKelas(res.data.data);
+    });
+  }, []);
+
+  const handleKelasChange = (event) => {
+    const selectedKelasId = event.target.value;
+    setFormData({ ...formData, kelasId: selectedKelasId });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,14 +48,14 @@ export default function TambahSiswa() {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      setFile(selectedFile); // Simpan file yang dipilih
-      uploadPhoto(selectedFile); // Upload foto
+      setFile(selectedFile);
+      uploadPhoto(selectedFile);
     }
   };
 
   const uploadPhoto = async (selectedFile) => {
     const formData = new FormData();
-    formData.append("foto", selectedFile); // Pastikan kunci adalah 'foto'
+    formData.append("foto", selectedFile);
 
     try {
       const response = await axios.post(
@@ -44,16 +63,16 @@ export default function TambahSiswa() {
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data", // Ini opsional, tapi bisa dicoba
-            Authorization: `Bearer ${Cookies.get("token")}`, // Pastikan token valid
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${Cookies.get("token")}`,
           },
         }
       );
 
       if (response.data.status) {
-        setFoto(response.data.data.foto); // Simpan URL foto jika upload berhasil
-        setFormData({ ...formData, foto: response.data.data.foto }); // Simpan URL foto ke formData
-        alert(response.data.message); // Tampilkan pesan sukses
+        setFoto(response.data.data.foto);
+        setFormData({ ...formData, foto: response.data.data.foto });
+        alert(response.data.message);
       } else {
         alert("Upload foto gagal.");
       }
@@ -67,29 +86,36 @@ export default function TambahSiswa() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Mencegah reload halaman
+    e.preventDefault();
+  
+    const updatedFormData = {
+      ...formData,
+      foto: formData.foto || defaultProfile,
+    };
+  
     try {
       const response = await axios.post(
         "http://localhost:3000/api/admin/siswa",
         {
-          ...formData,
-          kelasId: parseInt(formData.kelasId), // Pastikan kelasId adalah integer
+          ...updatedFormData,
+          kelasId: parseInt(updatedFormData.kelasId),
         },
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("token")}`,
-          },
-        }
+        config
       );
-
+  
       if (response.data.status) {
-        alert("Data siswa berhasil disimpan");
+        Swal.fire({
+          icon: "success",
+          title: "Sukses Menyimpan Data",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       } else {
         alert("Gagal menyimpan data siswa.");
       }
     } catch (error) {
       console.error("Error saving student data:", error);
-      alert(`Error: ${error.response.data.message || "Terjadi kesalahan"}`);
+      alert(`Error: ${error.response?.data?.message || "Terjadi kesalahan"}`);
     }
     setFormData({
       nis: "",
@@ -106,6 +132,8 @@ export default function TambahSiswa() {
       foto: "",
     });
   };
+  
+  
 
   return (
     <div className="ml-96 pl-32 my-2">
@@ -119,14 +147,21 @@ export default function TambahSiswa() {
               accept="image/*"
               style={{ display: "block", margin: "10px 0" }}
             />
-            {foto && (
+            {foto ? (
               <img
                 src={foto}
-                alt="Uploaded"
+                alt="Foto Profile"
+                className="max-h-[150px] max-w-32"
+              />
+            ) : (
+              <img
+                src={defaultProfile}
+                alt="Foto Profile"
                 className="max-h-[150px] max-w-32"
               />
             )}
           </div>
+
           <div>
             <div className="grid grid-cols-2 gap-2 mx-auto my-3">
               <div>
@@ -189,7 +224,7 @@ export default function TambahSiswa() {
                 </label>
                 <input
                   required
-                  type="text"
+                  type="number"
                   id="nis"
                   name="nis"
                   value={formData.nis}
@@ -202,17 +237,22 @@ export default function TambahSiswa() {
                   htmlFor="kelasId"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Kelas Id
+                  Kelas
                 </label>
-                <input
-                  required
-                  type="number"
-                  id="kelasId"
-                  name="kelasId"
+                <select
+                  onChange={handleKelasChange}
                   value={formData.kelasId}
-                  onChange={handleChange}
+                  name="kelasId"
                   className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                />
+                  required
+                >
+                  <option value="">Pilih Kelas</option>
+                  {kelas.map((res) => (
+                    <option key={res.id} value={res.id}>
+                      {res.nama}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label

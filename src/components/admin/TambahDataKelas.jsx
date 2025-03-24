@@ -10,7 +10,7 @@ import {
 } from "@material-tailwind/react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-const TABLE_HEAD = ["Id Kelas", "Nama Kelas", "Absen", "Action"];
+const TABLE_HEAD = ["No", "Nama Kelas", "Absen", "Action"];
 
 export function TambahDataKelas() {
   let config = {
@@ -18,7 +18,7 @@ export function TambahDataKelas() {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
-  const [dataKelas, setDataKelas] = useState(null);
+  const [dataKelas, setDataKelas] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [input, setInput] = useState({
     nama: "",
@@ -26,6 +26,8 @@ export function TambahDataKelas() {
   const [fetchStatus, setFetchStatus] = useState(true);
   const [currentId, setCurrentId] = useState(-1);
   const handleOpen = () => setOpen((cur) => !cur);
+  const [currentPage, setCurrentPage] = useState(1);
+  const dataPerPage = 5;
 
   useEffect(() => {
     if (fetchStatus === true) {
@@ -84,9 +86,41 @@ export function TambahDataKelas() {
   };
 
   const handleEdit = (event) => {
-    handleOpen();
     let idData = parseInt(event.target.value);
-    setCurrentId(idData);
+    let kelasToEdit = dataKelas.find((kelas) => kelas.id === idData);
+
+    if (kelasToEdit) {
+      setInput({
+        nama: kelasToEdit.nama,
+      });
+
+      setCurrentId(idData);
+      handleOpen();
+    }
+  };
+
+  const handleAdd = () => {
+    setCurrentId(-1);
+    setInput({
+      nama: "",
+    });
+    handleOpen();
+  };
+
+  const indexOfLastData = currentPage * dataPerPage;
+  const indexOfFirstData = indexOfLastData - dataPerPage;
+  const currentData = dataKelas.slice(indexOfFirstData, indexOfLastData);
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(dataKelas.length / dataPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
@@ -97,7 +131,7 @@ export function TambahDataKelas() {
       <div className="grid grid-rows-[auto_auto] justify-center ml-80">
         <div className="my-2 justify-self-end">
           <button
-            onClick={handleOpen}
+            onClick={handleAdd}
             className="border border-blue-gray-300 py-1 px-2 bg-blue-gray-300 text-white hover:bg-white hover:text-blue-gray-300"
           >
             Tambah Kelas
@@ -124,8 +158,8 @@ export function TambahDataKelas() {
               </tr>
             </thead>
             <tbody>
-              {dataKelas !== null &&
-                dataKelas.map((res, index) => {
+              {currentData !== null &&
+                currentData.map((res, index) => {
                   const isLast = index === res.id.length - 1;
                   const classes = isLast
                     ? "p-4 border-b border-blue-gray-50"
@@ -139,7 +173,7 @@ export function TambahDataKelas() {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {res.id}
+                          {index + 1}
                         </Typography>
                       </td>
                       <td className={classes}>
@@ -152,7 +186,7 @@ export function TambahDataKelas() {
                         </Typography>
                       </td>
                       <td className=" text-white  p-4 border-b border-blue-gray-50">
-                        <Link to={'/absenbyadmin'}>
+                        <Link to={`/absenbyadmin/${res.id}`}>
                           <button className="bg-blue-300 px-2 border border-white h-8 hover:bg-blue-400">
                             Absen
                           </button>
@@ -180,13 +214,13 @@ export function TambahDataKelas() {
             </tbody>
           </table>
           <div className="flex justify-end p-4 ">
-            <button className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+            <button onClick={handlePreviousPage} className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
               Previous
             </button>
             <div className="border w-8 bg-blue-gray-200 border-blue-gray-200 text-white text-center pt-2">
-              1
+            {currentPage}
             </div>
-            <button className="border-4 w-20 h-10 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+            <button onClick={handleNextPage} className="border-4 w-20 h-10 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
               Next
             </button>
           </div>

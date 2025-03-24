@@ -247,6 +247,11 @@ export default function SidebarAdmin() {
                   Jadwal Pelajaran
                 </ListItem>
               </Link>
+              <Link to={"/tambahwalikelas"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Wali Kelas
+                </ListItem>
+              </Link>
             </List>
           </AccordionBody>
         </Accordion>

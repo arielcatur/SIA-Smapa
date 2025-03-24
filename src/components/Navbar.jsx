@@ -5,13 +5,13 @@ import Cookies from "js-cookie";
 
 export default function Navbar() {
   const [userRole, setUserRole] = useState("");
-  const [userName, setUserName] = useState("");
+  const [name, setName] = useState("");
 
   useEffect(() => {
     const role = Cookies.get("role");
     setUserRole(role)
-    const userName = Cookies.get("username");
-    setUserName(userName)
+    const name = Cookies.get("name");
+    setName(name)
   }, []);
 
   const getProfileLink = () => {
@@ -36,7 +36,7 @@ export default function Navbar() {
         <div className="flex items-center gap-x-2 p-1 px-4">
           <PROFILE />
           <Link to={getProfileLink()} className="flex items-center text-white">
-          {userName}
+          {name}
           </Link>
         </div>
       </div>

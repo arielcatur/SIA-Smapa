@@ -9,13 +9,11 @@ import {
   CardBody,
   CardFooter,
   Input,
-  Select,
-  Option,
 } from "@material-tailwind/react";
 
 const TABLE_HEAD = ["No", "Nama", "NIS", "Nilai", "Action"];
 
-export function NilaiUtsGuru() {
+export function NilaiUasGuru() {
   const [mataPelajaran, setMataPelajaran] = useState([]);
   const [selectedMatpelId, setSelectedMatpelId] = useState("");
   const handleOpen = () => setOpen((cur) => !cur);
@@ -51,16 +49,18 @@ export function NilaiUtsGuru() {
     };
 
     const fetchNilaiData = async () => {
+      // Hanya melakukan fetch jika mata pelajaran dipilih
       if (!selectedMatpelId) {
-        setNilaiData([]);
+        setNilaiData([]); // Kosongkan data nilai jika belum memilih mata pelajaran
         return;
       }
 
       try {
         const resNilai = await axios.get(
-          `http://localhost:3000/api/guru/nilai-uts`,
+          `http://localhost:3000/api/guru/nilai-uas`,
           config
         );
+        console.log(resNilai);
         const nilaiFiltered = resNilai.data.data.filter(
           (item) =>
             item.kelas.id == kelasId &&
@@ -72,42 +72,17 @@ export function NilaiUtsGuru() {
       }
     };
 
-    // const fetchMataPelajaran = async () => {
-    //   try {
-    //     const resMatpel = await axios.get(
-    //       `http://localhost:3000/api/guru/jadwal-mengajar`,
-    //       config
-    //     );
-    //     const matpelFiltered = resMatpel.data.data.filter(
-    //       (item) => item.kelas.id == kelasId
-    //     );
-    //     setMataPelajaran(matpelFiltered);
-    //     console.log(mataPelajaran);
-    //   } catch (error) {
-    //     console.error("Error fetching mata pelajaran", error);
-    //   }
-    // };
     const fetchMataPelajaran = async () => {
       try {
         const resMatpel = await axios.get(
           `http://localhost:3000/api/guru/jadwal-mengajar`,
           config
         );
-
         const matpelFiltered = resMatpel.data.data.filter(
           (item) => item.kelas.id == kelasId
         );
-
-        const uniqueMatpel = matpelFiltered.filter(
-          (item, index, self) =>
-            index ===
-            self.findIndex(
-              (matpel) => matpel.mataPelajaran.id === item.mataPelajaran.id
-            )
-        );
-
-        setMataPelajaran(uniqueMatpel);
-        console.log(uniqueMatpel);
+        setMataPelajaran(matpelFiltered);
+        console.log(mataPelajaran);
       } catch (error) {
         console.error("Error fetching mata pelajaran", error);
       }
@@ -122,7 +97,7 @@ export function NilaiUtsGuru() {
     const nilaiObj = nilaiData.find((nilai) => nilai.siswa.id === siswa.id);
     return {
       ...siswa,
-      nilai: nilaiObj ? nilaiObj.nilai : 0,
+      nilai: nilaiObj ? nilaiObj.nilai : 0, // Nilai default menjadi 0 jika tidak ada nilai
       matpelId:
         nilaiObj && nilaiObj.mataPelajaran
           ? nilaiObj.mataPelajaran.id
@@ -132,10 +107,20 @@ export function NilaiUtsGuru() {
   });
 
   const handleMatpelChange = (event) => {
-    const matpelId = event.target.value;
+    const matpelId = event.target.value; // Pastikan event ada dan memiliki target
     setSelectedMatpelId(matpelId);
-    console.log("Mata Pelajaran yang Dipilih:", matpelId);
+    // console.log("Mata Pelajaran yang Dipilih:", matpelId);
   };
+
+  // const mergedData = siswaData.map((siswa) => {
+  //   const nilaiObj = nilaiData.find((nilai) => nilai.siswa.id === siswa.id);
+  //   return {
+  //     ...siswa,
+  //     nilai: nilaiObj ? nilaiObj.nilai : 0, // Jika tidak ada nilai, default 0
+  //     matpelId: nilaiObj && nilaiObj.mataPelajaran ? nilaiObj.mataPelajaran.id : selectedMatpelId || "", // Menggunakan matpelId dari nilaiObj atau selectedMatpelId
+  //     nilaiId: nilaiObj ? nilaiObj.id : null, // Menyimpan ID nilai
+  //   };
+  // });
 
   const handleEdit = (event) => {
     const idData = parseInt(event.target.value);
@@ -165,7 +150,7 @@ export function NilaiUtsGuru() {
       if (!input.nilaiId) {
         // Jika nilaiId tidak ada, lakukan POST untuk insert data baru
         await axios.post(
-          `http://localhost:3000/api/guru/nilai-uts`,
+          `http://localhost:3000/api/guru/nilai-uas`,
           {
             nilai: input.nilai,
             siswaId: input.siswaId,
@@ -187,7 +172,7 @@ export function NilaiUtsGuru() {
       } else {
         // Jika nilaiId ada, lakukan PUT untuk update data yang sudah ada
         await axios.post(
-          `http://localhost:3000/api/guru/nilai-uts/${input.nilaiId}`,
+          `http://localhost:3000/api/guru/nilai-uas/${input.nilaiId}`,
           {
             nilai: input.nilai,
             siswaId: input.siswaId,
@@ -305,9 +290,7 @@ export function NilaiUtsGuru() {
                   </td>
                   <td className="grid grid-cols-1 text-white p-4 border-b border-blue-gray-50">
                     <button
-                      className={`bg-blue-300 border border-white h-8 hover:bg-blue-400 ${
-                        !selectedMatpelId ? "cursor-not-allowed opacity-50" : ""
-                      }`}
+                      className={`bg-blue-300 border border-white h-8 hover:bg-blue-400 ${!selectedMatpelId ? 'cursor-not-allowed opacity-50' : ''}`}
                       value={res.id}
                       onClick={handleEdit}
                       disabled={!selectedMatpelId}
@@ -343,7 +326,7 @@ export function NilaiUtsGuru() {
           <Card className="mx-auto w-full max-w-[24rem]">
             <CardBody className="flex flex-col gap-4">
               <Typography variant="h4" color="blue-gray">
-                Input Nilai UTS
+                Input Nilai UAS
               </Typography>
               <Input
                 type="number" // Batasi input hanya angka

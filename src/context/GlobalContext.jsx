@@ -7,14 +7,14 @@ export const GlobalContext = createContext();
 
 export const GlobalProvider = (props) => {
   let navigate = useNavigate();
-  const [user, setUser] = useState()
-  const [token, setToken] = useState()
+  const [user, setUser] = useState();
+  const [token, setToken] = useState();
   const [data, setData] = useState();
   const [input, setInput] = useState({
     username: "",
     password: "",
     role: "",
-    nama: ""
+    nama: "",
   });
   const [selectedImage, setSelectedImage] = useState(null);
   const [fetchStatus, setFetchStatus] = useState(true);
@@ -31,15 +31,17 @@ export const GlobalProvider = (props) => {
       })
       .then((res) => {
         let data = res.data;
-        console.log(data.data)
+        console.log(data.data);
         Cookies.set("token", data.token, { expires: 1 });
         Cookies.set("role", data.data.hakAkses, { expires: 1 });
         Cookies.set("username", data.data.username, { expires: 1 });
-        // console.log(res.data.token)
-        setToken(res.data.token)
-        setUser(role)
-        // console.log(user)
-        // setUser(res.data.role);
+
+        const nama = data.data.profile
+          ? data.data.profile.nama
+          : data.data.hakAkses;
+        Cookies.set("name", nama, { expires: 1 });
+        setToken(res.data.token);
+        setUser(role);
         if (role === "siswa") {
           navigate("/homesiswa");
         } else if (role === "wali murid") {
@@ -55,18 +57,10 @@ export const GlobalProvider = (props) => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Something went wrong!",
+          text: "Akun tidak ditemukan",
         });
       });
-
   };
-
-  // const handleLogOut = () => {
-  //   setUser(null);
-  //   setToken("");
-  //   localStorage.removeItem("site");
-  //   navigate("/login");
-  // };
 
   const handleRegist = (event) => {
     event.preventDefault();
@@ -90,22 +84,12 @@ export const GlobalProvider = (props) => {
       });
   };
 
-  // const getKelas = () => {
-  //   useEffect(()=>{
-  //     console.log(fetchStatus)
-  //     if (fetchStatus === true){
-  //         axios.get("http://localhost:3000/api/admin/kelas")
-  //         .then((res) => {
-  //             setData( [...res.data] )
-  //         })
-  //         .catch((err) => {
-  //             console.log(err)
-  //         })
-  //         setFetchStatus(false)
-  //     }
-  //     setFetchStatus(true)
-  // }, [fetchStatus, setFetchStatus])
-  // }
+  const truncateDescription15 = (description) => {
+    if (description.length > 15) {
+      return description.substring(0, 15) + '...';
+    }
+    return description;
+}
 
   const handleChange = (event) => {
     let value = event.target.value;
@@ -118,7 +102,7 @@ export const GlobalProvider = (props) => {
     handleChange,
     handleLogin,
     handleRegist,
-    // getKelas
+    truncateDescription15
   };
 
   const state = {
@@ -131,7 +115,7 @@ export const GlobalProvider = (props) => {
     user,
     setUser,
     token,
-    setToken
+    setToken,
   };
 
   return (

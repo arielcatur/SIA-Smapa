@@ -9,9 +9,13 @@ import {
 } from "@material-tailwind/react";
 import Cookies from "js-cookie";
 import axios from "axios";
-const TABLE_HEAD = ["Id Matpel", "Mata Pelajaran", "Action"];
-
-export function DataMataPelajaran() {
+const TABLE_HEAD = [
+  "No",
+  "Nama Guru",
+  "Nama Kelas",
+  "Action",
+];
+export function TambahWaliKelas() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen((cur) => !cur);
   let config = {
@@ -19,25 +23,41 @@ export function DataMataPelajaran() {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
+
+  const [data, setData] = useState([]);
+  const [guru, setGuru] = useState([]);
+  const [kelas, setKelas] = useState([]);
   const [input, setInput] = useState({
-    nama: "",
+    guruId: "",
+    kelasId: "",
   });
-  const [dataMatpel, setDataMatpel] = useState([]);
   const [fetchStatus, setFetchStatus] = useState(true);
   const [currentId, setCurrentId] = useState(-1);
   const [currentPage, setCurrentPage] = useState(1);
   const dataPerPage = 5;
 
   useEffect(() => {
+    axios.get("http://localhost:3000/api/admin/kelas", config).then((res) => {
+      setKelas(res.data.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/admin/guru", config).then((res) => {
+      setGuru(res.data.data);
+    });
+  }, []);
+
+  useEffect(() => {
     if (fetchStatus === true) {
       axios
-        .get("http://localhost:3000/api/admin/matpel", config)
+        .get("http://localhost:3000/api/admin/wali-kelas", config)
         .then((res) => {
-          // console.log(res.data.data);
-          setDataMatpel([...res.data.data]);
+          setData([...res.data.data]);
         })
         .catch((error) => {});
       setFetchStatus(false);
+      console.log(currentData);
     }
   }, [fetchStatus, setFetchStatus]);
 
@@ -47,32 +67,55 @@ export function DataMataPelajaran() {
     setInput({ ...input, [name]: value });
   };
 
+  const handleGuruChange = (event) => {
+    const selectedGuruId = event.target.value;
+    setInput({ ...input, guruId: selectedGuruId });
+  };
+
+  const handleKelasChange = (event) => {
+    const selectedKelasId = event.target.value;
+    setInput({ ...input, kelasId: selectedKelasId });
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    let { nama } = input;
+    let { guruId, kelasId } = input;
     if (currentId === -1) {
       axios
-        .post("http://localhost:3000/api/admin/matpel", { nama }, config)
-        .then((res) => {
-          console.log(res);
-          setFetchStatus(true);
-        });
-    } else {
-      axios
         .post(
-          `http://localhost:3000/api/admin/matpel/${currentId}`,
-          { nama },
+          "http://localhost:3000/api/admin/wali-kelas",
+          { guruId, kelasId },
           config
         )
         .then((res) => {
           console.log(res);
           setFetchStatus(true);
+        })
+        .catch((error) => {
+          console.error("Error saat menambah jadwal pelajaran:", error);
+          alert(`Gagal menambah jadwal`);
+        });
+    } else {
+      axios
+        .post(
+          `http://localhost:3000/api/admin/wali-kelas/${currentId}`,
+          { guruId, kelasId },
+          config
+        )
+        .then((res) => {
+          console.log(res);
+          setFetchStatus(true);
+        })
+        .catch((error) => {
+          console.error("Error saat memperbarui jadwal pelajaran:", error);
+          alert(`Gagal memperbarui jadwal`);
         });
     }
     setCurrentId(-1);
     setInput({
-      nama: "",
+      guruId: "",
+      kelasId: "",
     });
   };
 
@@ -80,7 +123,10 @@ export function DataMataPelajaran() {
     let idData = parseInt(event.target.value);
 
     axios
-      .delete(`http://localhost:3000/api/admin/matpel/${idData}`, config)
+      .delete(
+        `http://localhost:3000/api/admin/jadwal-pelajaran/${idData}`,
+        config
+      )
       .then((res) => {
         setFetchStatus(true);
       });
@@ -89,18 +135,20 @@ export function DataMataPelajaran() {
   const handleAdd = () => {
     setCurrentId(-1);
     setInput({
-      nama: "",
+      guruId: "",
+      kelasId: "",
     });
     handleOpen();
   };
 
   const handleEdit = (event) => {
     let idData = parseInt(event.target.value);
-    let matpelToEdit = dataMatpel.find((matpel) => matpel.id === idData);
+    let jadwalToEdit = data.find((jadwal) => jadwal.id === idData);
 
-    if (matpelToEdit) {
+    if (jadwalToEdit) {
       setInput({
-        nama: matpelToEdit.nama,
+        guruId: jadwalToEdit.guru.id,
+        kelasId: jadwalToEdit.kelas.id,
       });
 
       setCurrentId(idData);
@@ -110,10 +158,10 @@ export function DataMataPelajaran() {
 
   const indexOfLastData = currentPage * dataPerPage;
   const indexOfFirstData = indexOfLastData - dataPerPage;
-  const currentData = dataMatpel.slice(indexOfFirstData, indexOfLastData);
+  const currentData = data.slice(indexOfFirstData, indexOfLastData);
 
   const handleNextPage = () => {
-    if (currentPage < Math.ceil(dataMatpel.length / dataPerPage)) {
+    if (currentPage < Math.ceil(data.length / dataPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -128,7 +176,7 @@ export function DataMataPelajaran() {
     <>
       <div className="ml-80 py-4">
         <p className="flex justify-center font-bold text-xl">
-          Data Mata Pelajaran
+          Data Wali Kelas
         </p>
       </div>
       <div className="grid grid-rows-[auto_auto] justify-center ml-80">
@@ -137,10 +185,10 @@ export function DataMataPelajaran() {
             onClick={handleAdd}
             className="border border-blue-gray-300 py-1 px-2 bg-blue-gray-300 text-white hover:bg-white hover:text-blue-gray-300"
           >
-            Tambah mata pelajaran
+            Tambah Wali Kelas
           </button>
         </div>
-        <Card className="h-full w-[550px] rounded-none">
+        <Card className="h-full w-[850px] rounded-none">
           <table className="w-full min-w-max table-auto text-center">
             <thead>
               <tr>
@@ -176,7 +224,7 @@ export function DataMataPelajaran() {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {res.id}
+                          {index + 1}
                         </Typography>
                       </td>
                       <td className={classes}>
@@ -185,7 +233,16 @@ export function DataMataPelajaran() {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {res.nama}
+                          {res.guru.nama}
+                        </Typography>
+                      </td>
+                      <td className={classes}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {res.kelas.nama}
                         </Typography>
                       </td>
                       <td className="grid grid-cols-2 text-white  p-4 border-b border-blue-gray-50">
@@ -210,19 +267,24 @@ export function DataMataPelajaran() {
             </tbody>
           </table>
           <div className="flex justify-end p-4 ">
-            <button onClick={handlePreviousPage} className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+            <button
+              onClick={handlePreviousPage}
+              className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+            >
               Previous
             </button>
             <div className="border w-8 bg-blue-gray-200 border-blue-gray-200 text-white text-center pt-2">
-            {currentPage}
+              {currentPage}
             </div>
-            <button onClick={handleNextPage} className="border-4 w-20 h-10 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+            <button
+              onClick={handleNextPage}
+              className="border-4 w-20 h-10 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+            >
               Next
             </button>
           </div>
         </Card>
       </div>
-      {/* <Button onClick={handleOpen} className=" ml-80">Sign In</Button> */}
       {/* modal */}
       <Dialog
         size="xs"
@@ -234,22 +296,54 @@ export function DataMataPelajaran() {
           <Card className="mx-auto w-full max-w-[24rem]">
             <CardBody className="flex flex-col gap-4">
               <Typography variant="h4" color="blue-gray">
-                Tambah Mata Pelajaran
+                Tambah/Edit Wali Kelas
               </Typography>
-              <Typography className="-mb-2" variant="h6">
-                Nama Mata Pelajaran
-              </Typography>
-              <Input
+              {/* <Input
                 onChange={handleInput}
-                value={input.nama}
-                // type={"submit"}
-                name="nama"
-                label="Nama Mata Pelajaran"
+                value={input.guruId}
+                name="guruId"
+                label="Id Guru"
                 size="lg"
-              />
+                type="number"
+                required
+              /> */}
+
+              <select
+                onChange={handleGuruChange}
+                value={input.guruId}
+                name="guruId"
+                className="border border-gray-300 rounded-lg p-2"
+                required
+              >
+                <option value="">Pilih Guru</option>
+                {guru.map((res) => (
+                  <option key={res.id} value={res.id}>
+                    {res.nama}
+                  </option>
+                ))}
+              </select>
+              <select
+                onChange={handleKelasChange}
+                value={input.kelasId}
+                name="kelasId"
+                className="border border-gray-300 rounded-lg p-2"
+                required
+              >
+                <option value="">Pilih Kelas</option>
+                {kelas.map((res) => (
+                  <option key={res.id} value={res.id}>
+                    {res.nama}
+                  </option>
+                ))}
+              </select>
             </CardBody>
             <CardFooter className="pt-0">
-              <Button type={"submit"} variant="gradient" onClick={handleOpen} fullWidth>
+              <Button
+                onClick={handleOpen}
+                type="submit"
+                variant="gradient"
+                fullWidth
+              >
                 Simpan
               </Button>
             </CardFooter>

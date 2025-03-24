@@ -14,7 +14,7 @@ import {
   PowerIcon,
 } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { BOOK, HOME, INFO, KEY } from "../Icons";
+import { BOOK, HOME, INFO, KEY, WALI } from "../Icons";
 import { Link } from "react-router-dom";
 
 export default function SidebarGuru() {
@@ -124,9 +124,67 @@ export default function SidebarGuru() {
                   Nilai UTS
                 </ListItem>
               </Link>
-              <Link to={"/inputnilaiuts"}>
+              <Link to={"/inputnilaiuas"}>
                 <ListItem className="hover:text-white active:text-white focus:text-white">
                   Nilai UAS
+                </ListItem>
+              </Link>
+            </List>
+          </AccordionBody>
+        </Accordion>
+        <Accordion
+          open={open === 3}
+          icon={
+            <ChevronDownIcon
+              stroke="white"
+              strokeWidth={2.5}
+              className={`mx-auto h-4 w-4 transition-transform ${
+                open === 3 ? "rotate-180" : ""
+              }`}
+            />
+          }
+        >
+          <ListItem className="p-0" selected={open === 3}>
+            <AccordionHeader
+              onClick={() => handleOpen(3)}
+              className="border-b-0 p-3"
+            >
+              <ListItemPrefix>
+                <WALI />
+              </ListItemPrefix>
+              <Typography
+                color="blue-gray"
+                className="text-white mr-auto font-normal"
+              >
+                Monitoring Wali Kelas
+              </Typography>
+            </AccordionHeader>
+          </ListItem>
+          <AccordionBody className="py-1">
+            <List className="text-white p-0 pl-8">
+              <Link to={"/lihatsiswa"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Lihat Siswa
+                </ListItem>
+              </Link>
+              {/* <Link to={"/lihatwalimurid"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Lihat Wali Murid
+                </ListItem>
+              </Link> */}
+              <Link to={"/lihatnilaiuts"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Lihat Nilai UTS
+                </ListItem>
+              </Link>
+              <Link to={"/lihatnilaiuas"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Lihat Nilai UAS
+                </ListItem>
+              </Link>
+              <Link to={"/absenbyguru"}>
+                <ListItem className="hover:text-white active:text-white focus:text-white">
+                  Absen Siswa
                 </ListItem>
               </Link>
             </List>

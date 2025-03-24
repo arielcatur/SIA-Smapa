@@ -3,18 +3,19 @@ import Search from "../Search";
 import axios from "axios";
 import Cookies from "js-cookie";
 import React, { useContext, useEffect, useState } from "react";
-
+import { ARROWRIGHT } from "../Icons";
+import { Link } from "react-router-dom";
 const TABLE_HEAD = [
   "No",
   "Nama",
-  "Kelas",
-  "Agama",
-  "NIP",
-  "Jenis Kelamin",
-  "Tempat Tanggal Lahir",
+  "Biodata",
+  "Orang Tua",
+  "Nilai UTS",
+  "Nilai UAS",
+  "Absen",
 ];
 
-export function DaftarSiswa() {
+export function WaliKelas() {
   let config = {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
@@ -30,7 +31,7 @@ export function DaftarSiswa() {
       .get("http://localhost:3000/api/guru/siswa", config)
       .then((res) => {
         setData([...res.data.data]);
-        console.log(res.data.data)
+        console.log(res.data.data);
       })
       .catch((error) => {});
   }, []);
@@ -60,7 +61,7 @@ export function DaftarSiswa() {
       <div className="ml-80 py-4">
         <p className="flex justify-center font-bold text-xl">Daftar Siswa</p>
         <div className="mx-4 flex justify-between">
-          <p className="pt-2 font-semibold text-base">Daftar Siswa</p>
+          <p className="pt-2 font-semibold text-base">Kelas XII 1</p>
           <input
             type="text"
             placeholder="Cari Nama Siswa..."
@@ -91,74 +92,58 @@ export function DaftarSiswa() {
             </tr>
           </thead>
           <tbody>
-            {currentData.length > 0 ? (
-              currentData.map((res, index) => (
-                <tr key={res.id}>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {indexOfFirstData + index + 1}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-semibold"
-                    >
-                      {res.nama}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.kelas.nama}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.agama}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.nis}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.jk}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.ttl}
-                    </Typography>
-                  </td>
-                </tr>
-              ))
+            {/* {currentData.length > 0 ? (
+              currentData.map((res, index) => ( */}
+            <tr>
+              <td className="p-4 border-b border-blue-gray-50">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal"
+                >
+                  1{/* {indexOfFirstData + index + 1} */}
+                </Typography>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                Ariel Catur Putra Kalew
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <Link>
+                  <button className="bg-black w-8 h-8 border-4 border-black ">
+                    <ARROWRIGHT />
+                  </button>
+                </Link>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <Link>
+                  <button className="bg-black w-8 h-8 border-4 border-black ">
+                    <ARROWRIGHT />
+                  </button>
+                </Link>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <Link>
+                  <button className="bg-black w-8 h-8 border-4 border-black ">
+                    <ARROWRIGHT />
+                  </button>
+                </Link>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <Link>
+                  <button className="bg-black w-8 h-8 border-4 border-black ">
+                    <ARROWRIGHT />
+                  </button>
+                </Link>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <Link>
+                  <button className="bg-black w-8 h-8 border-4 border-black ">
+                    <ARROWRIGHT />
+                  </button>
+                </Link>
+              </td>
+            </tr>
+            {/* ))
             ) : (
               <tr>
                 <td colSpan={TABLE_HEAD.length} className="p-4">
@@ -171,7 +156,7 @@ export function DaftarSiswa() {
                   </Typography>
                 </td>
               </tr>
-            )}
+            )} */}
           </tbody>
         </table>
         <div className="flex justify-end p-4">

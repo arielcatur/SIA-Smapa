@@ -47,6 +47,7 @@ export default function Login() {
                 Username
               </label>
               <input
+                required
                 onChange={handleChange}
                 value={input.username}
                 type="text"
@@ -64,6 +65,7 @@ export default function Login() {
                 Password
               </label>
               <input
+                required
                 onChange={handleChange}
                 value={input.password}
                 type="password"
@@ -77,10 +79,12 @@ export default function Login() {
                 Role
               </label>
               <select
-              className="border-2 border-gray-300 p-1 rounded"
-              value={input.role} 
-              onChange={handleChange} 
-              name="role">
+                required
+                className="border-2 border-gray-300 p-1 rounded"
+                value={input.role}
+                onChange={handleChange}
+                name="role"
+              >
                 {options.map((option) => (
                   <option value={option.value}>{option.label}</option>
                 ))}

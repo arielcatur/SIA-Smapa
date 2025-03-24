@@ -95,74 +95,6 @@ export function DaftarGuru() {
               ))}
             </tr>
           </thead>
-          {/* <tbody>
-            {data !== null &&
-              data.map((res, index) => {
-                const isLast = index === res.id.length - 1;
-                const classes = isLast
-                  ? "p-4"
-                  : "p-4 border-b border-blue-gray-50";
-
-                return (
-                  <tr key={res.id}>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {index + 1}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.nama}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.agama}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.nig}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.jk}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {res.ttl}
-                      </Typography>
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody> */}
           <tbody>
             {currentData.length > 0 ? (
               currentData.map((res, index) => (
@@ -238,6 +170,23 @@ export function DaftarGuru() {
             )}
           </tbody>
         </table>
+        <div className="flex justify-end p-4">
+          <button
+            onClick={handlePreviousPage}
+            className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+          >
+            Previous
+          </button>
+          <div className="border w-8 bg-blue-gray-200 border-blue-gray-200 text-white text-center pt-2">
+            {currentPage}
+          </div>
+          <button
+            onClick={handleNextPage}
+            className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+          >
+            Next
+          </button>
+        </div>
       </Card>
     </>
   );

@@ -17,7 +17,6 @@ const TABLE_HEAD = [
   "Nama Matpel",
   "Action",
 ];
-
 export function TambahJadwal() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen((cur) => !cur);
@@ -26,7 +25,10 @@ export function TambahJadwal() {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
-  const [data, setData] = useState(null);
+
+  const [data, setData] = useState([]);
+  const [mataPelajaran, setMataPelajaran] = useState([]);
+  const [kelas, setKelas] = useState([]);
   const [input, setInput] = useState({
     hari: "",
     jam: "",
@@ -34,20 +36,33 @@ export function TambahJadwal() {
     kelasId: "",
     matpelId: "",
   });
-  //indikator
   const [fetchStatus, setFetchStatus] = useState(true);
   const [currentId, setCurrentId] = useState(-1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const dataPerPage = 5;
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/admin/kelas", config).then((res) => {
+      setKelas(res.data.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/admin/matpel", config).then((res) => {
+      setMataPelajaran(res.data.data);
+    });
+  }, []);
 
   useEffect(() => {
     if (fetchStatus === true) {
       axios
         .get("http://localhost:3000/api/admin/jadwal-pelajaran", config)
         .then((res) => {
-          // console.log(res.data.data);
           setData([...res.data.data]);
         })
         .catch((error) => {});
       setFetchStatus(false);
+      console.log(currentData);
     }
   }, [fetchStatus, setFetchStatus]);
 
@@ -55,6 +70,16 @@ export function TambahJadwal() {
     let value = event.target.value;
     let name = event.target.name;
     setInput({ ...input, [name]: value });
+  };
+
+  const handleMatpelChange = (event) => {
+    const selectedMatpelId = event.target.value;
+    setInput({ ...input, matpelId: selectedMatpelId });
+  };
+
+  const handleKelasChange = (event) => {
+    const selectedKelasId = event.target.value;
+    setInput({ ...input, kelasId: selectedKelasId });
   };
 
   const handleSubmit = (event) => {
@@ -71,6 +96,10 @@ export function TambahJadwal() {
         .then((res) => {
           console.log(res);
           setFetchStatus(true);
+        })
+        .catch((error) => {
+          console.error("Error saat menambah jadwal pelajaran:", error);
+          alert(`Gagal menambah jadwal`);
         });
     } else {
       axios
@@ -82,10 +111,13 @@ export function TambahJadwal() {
         .then((res) => {
           console.log(res);
           setFetchStatus(true);
+        })
+        .catch((error) => {
+          console.error("Error saat memperbarui jadwal pelajaran:", error);
+          alert(`Gagal memperbarui jadwal`);
         });
     }
     setCurrentId(-1);
-    // clear input setelah create data
     setInput({
       hari: "",
       jam: "",
@@ -99,16 +131,59 @@ export function TambahJadwal() {
     let idData = parseInt(event.target.value);
 
     axios
-      .delete(`http://localhost:3000/api/admin/jadwal-pelajaran/${idData}`, config)
+      .delete(
+        `http://localhost:3000/api/admin/jadwal-pelajaran/${idData}`,
+        config
+      )
       .then((res) => {
         setFetchStatus(true);
       });
   };
 
-  const handleEdit = (event) => {
+  const handleAdd = () => {
+    setCurrentId(-1);
+    setInput({
+      hari: "",
+      jam: "",
+      guruId: "",
+      kelasId: "",
+      matpelId: "",
+    });
     handleOpen();
+  };
+
+  const handleEdit = (event) => {
     let idData = parseInt(event.target.value);
-    setCurrentId(idData);
+    let jadwalToEdit = data.find((jadwal) => jadwal.id === idData);
+
+    if (jadwalToEdit) {
+      setInput({
+        hari: jadwalToEdit.hari,
+        jam: jadwalToEdit.jam,
+        guruId: jadwalToEdit.guru.id,
+        kelasId: jadwalToEdit.kelas.id,
+        matpelId: jadwalToEdit.mataPelajaran.id,
+      });
+
+      setCurrentId(idData);
+      handleOpen();
+    }
+  };
+
+  const indexOfLastData = currentPage * dataPerPage;
+  const indexOfFirstData = indexOfLastData - dataPerPage;
+  const currentData = data.slice(indexOfFirstData, indexOfLastData);
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(data.length / dataPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
@@ -121,7 +196,7 @@ export function TambahJadwal() {
       <div className="grid grid-rows-[auto_auto] justify-center ml-80">
         <div className="my-2 justify-self-end">
           <button
-            onClick={handleOpen}
+            onClick={handleAdd}
             className="border border-blue-gray-300 py-1 px-2 bg-blue-gray-300 text-white hover:bg-white hover:text-blue-gray-300"
           >
             Tambah jadwal pelajaran
@@ -148,8 +223,8 @@ export function TambahJadwal() {
               </tr>
             </thead>
             <tbody>
-              {data !== null &&
-                data.map((res, index) => {
+              {currentData !== null &&
+                currentData.map((res, index) => {
                   const isLast = index === res.id.length - 1;
                   const classes = isLast
                     ? "p-4 border-b border-blue-gray-50"
@@ -190,7 +265,7 @@ export function TambahJadwal() {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {res.kelas.nama} ({res.kelas.id})
+                          {res.kelas.nama}
                         </Typography>
                       </td>
                       <td className={classes}>
@@ -224,19 +299,24 @@ export function TambahJadwal() {
             </tbody>
           </table>
           <div className="flex justify-end p-4 ">
-            <button className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+            <button
+              onClick={handlePreviousPage}
+              className="w-20 h-10 border-4 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+            >
               Previous
             </button>
             <div className="border w-8 bg-blue-gray-200 border-blue-gray-200 text-white text-center pt-2">
-              1
+              {currentPage}
             </div>
-            <button className="border-4 w-20 h-10 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white">
+            <button
+              onClick={handleNextPage}
+              className="border-4 w-20 h-10 border-blue-gray-200 hover:bg-blue-gray-200 hover:text-white"
+            >
               Next
             </button>
           </div>
         </Card>
       </div>
-      {/* <Button onClick={handleOpen} className=" ml-80">Sign In</Button> */}
       {/* modal */}
       <Dialog
         size="xs"
@@ -248,9 +328,8 @@ export function TambahJadwal() {
           <Card className="mx-auto w-full max-w-[24rem]">
             <CardBody className="flex flex-col gap-4">
               <Typography variant="h4" color="blue-gray">
-                Tambah Jadwal Pelajaran
+                Tambah/Edit Jadwal Pelajaran
               </Typography>
-              {/* Dropdown Hari */}
               <select
                 onChange={handleInput}
                 value={input.hari}
@@ -266,7 +345,6 @@ export function TambahJadwal() {
                 <option value="jumat">Jumat</option>
               </select>
 
-              {/* Input Jam */}
               <Input
                 onChange={handleInput}
                 value={input.jam}
@@ -276,7 +354,6 @@ export function TambahJadwal() {
                 required
               />
 
-              {/* Input Guru ID (Angka) */}
               <Input
                 onChange={handleInput}
                 value={input.guruId}
@@ -287,33 +364,40 @@ export function TambahJadwal() {
                 required
               />
 
-              {/* Input Kelas ID (Angka) */}
-              <Input
-                onChange={handleInput}
+              <select
+                onChange={handleKelasChange}
                 value={input.kelasId}
                 name="kelasId"
-                label="Id Kelas"
-                size="lg"
-                type="number"
+                className="border border-gray-300 rounded-lg p-2"
                 required
-              />
-
-              {/* Input Matpel ID (Angka) */}
-              <Input
-                onChange={handleInput}
+              >
+                <option value="">Pilih Kelas</option>
+                {kelas.map((res) => (
+                  <option key={res.id} value={res.id}>
+                    {res.nama}
+                  </option>
+                ))}
+              </select>
+              <select
+                onChange={handleMatpelChange}
                 value={input.matpelId}
                 name="matpelId"
-                label="Id Matpel"
-                size="lg"
-                type="number"
+                className="border border-gray-300 rounded-lg p-2"
                 required
-              />
+              >
+                <option value="">Pilih Mata Pelajaran</option>
+                {mataPelajaran.map((matpel) => (
+                  <option key={matpel.id} value={matpel.id}>
+                    {matpel.nama}
+                  </option>
+                ))}
+              </select>
             </CardBody>
             <CardFooter className="pt-0">
               <Button
-                type={"submit"}
-                variant="gradient"
                 onClick={handleOpen}
+                type="submit"
+                variant="gradient"
                 fullWidth
               >
                 Simpan

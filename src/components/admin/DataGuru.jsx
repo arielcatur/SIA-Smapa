@@ -4,6 +4,7 @@ import { PLUS } from "../Icons";
 import axios from "axios";
 import Cookies from "js-cookie";
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 const TABLE_HEAD = [
   "Id Guru",
   "Nama",
@@ -60,11 +61,17 @@ export function DataGuru() {
 
   const handleDelete = (event) => {
     let idData = parseInt(event.target.value);
-
+    console.log(idData);
     axios
       .delete(`http://localhost:3000/api/admin/guru/${idData}`, config)
       .then((res) => {
         setFetchStatus(true);
+        Swal.fire({
+          icon: "success",
+          title: "Sukses Menghapus Data",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       });
   };
 
@@ -72,8 +79,8 @@ export function DataGuru() {
     <>
       <div className="ml-80 py-4">
         <p className="flex justify-center font-bold text-xl">Daftar Guru</p>
-        <div className="mx-4 flex justify-between">
-          <p className="pt-2 font-semibold text-base">Daftar Guru</p>
+        <div className="mx-4 flex justify-end">
+          {/* <p className="pt-2 font-semibold text-base">Daftar Guru</p> */}
           <div className="grid grid-cols-[auto_auto] gap-2">
             <input
               type="text"
@@ -173,10 +180,17 @@ export function DataGuru() {
                     </Typography>
                   </td>
                   <td className="grid grid-cols-2 text-white p-4 border-b border-blue-gray-50">
-                    <button className="bg-blue-300 border border-white h-8 hover:bg-blue-400">
-                      Edit
-                    </button>
-                    <button className="bg-red-300 border border-white h-8 hover:bg-red-400">
+                    <Link
+                      to={`/editguru/${res.user.id}`}
+                      className="bg-blue-300 border border-white h-8 hover:bg-blue-400"
+                    >
+                      <button className="pt-1">Edit</button>
+                    </Link>
+                    <button
+                      onClick={handleDelete}
+                      value={res.user.id}
+                      className="bg-red-300 border border-white h-8 hover:bg-red-400"
+                    >
                       Delete
                     </button>
                   </td>

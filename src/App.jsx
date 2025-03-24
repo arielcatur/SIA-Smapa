@@ -38,6 +38,21 @@ import ProfileAdmin from "./components/admin/ProfileAdmin";
 import ChangePassSiswa from "./components/ChangePass";
 import { TambahJadwal } from "./components/admin/TambahJadwal";
 import TambahWali from "./components/admin/TambahWali";
+import PilihMataPelajaran from "./components/guru/PilihMataPelajaran";
+import PilihKelas from "./components/guru/PilihKelas";
+import EditSiswa from "./components/admin/edit/EditSiswa";
+import { InputNilaiUAS } from "./components/guru/InputNilaiUAS";
+import { NilaiUasGuru } from "./components/guru/NilaiUasGuru";
+import EditWali from "./components/admin/edit/EditWali";
+import EditGuru from "./components/admin/edit/EditGuru";
+import { HomeAdmin2 } from "./components/admin/HomeAdmin2";
+import { WaliKelas } from "./components/guru/WaliKelas";
+import { AbsenByGuru } from "./components/guru/AbsenByGuru";
+import { TambahWaliKelas } from "./components/admin/TambahWaliKelas";
+import { LihatSiswa } from "./components/guru/monitoring/LihatSiswa";
+import { LihatWaliMurid } from "./components/guru/monitoring/LihatWaliMurid";
+import { LihatNilaiUTS } from "./components/guru/monitoring/LihatNilaiUTS";
+import { LihatNilaiUAS } from "./components/guru/monitoring/LihatNilaiUAS";
 
 export default function App() {
   return (
@@ -45,19 +60,9 @@ export default function App() {
       <BrowserRouter>
         <GlobalProvider>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <Login />
-              }
-            />
-            
-            <Route
-              path="/changepass"
-              element={
-                <ChangePassSiswa />
-              }
-            />
+            <Route path="/" element={<Login />} />
+
+            <Route path="/changepass" element={<ChangePassSiswa />} />
 
             {/*=============== SISWA ===============*/}
             <Route
@@ -137,7 +142,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/profilewali"
               element={
@@ -238,6 +243,28 @@ export default function App() {
             />
 
             <Route
+              path="/pilihmatpel"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <PilihMataPelajaran />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/pilih-kelas/:matpelId"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <PilihKelas />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
               path="/inputnilaiuts"
               element={
                 <ProtectedRoute requiredRole="guru">
@@ -249,7 +276,18 @@ export default function App() {
             />
 
             <Route
-              path="/nilaiutsguru"
+              path="/inputnilaiuas"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <InputNilaiUAS />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/nilaiutsguru/:kelasId"
               element={
                 <ProtectedRoute requiredRole="guru">
                   <Guru>
@@ -258,6 +296,84 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/nilaiuasguru/:kelasId"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <NilaiUasGuru />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/walikelas"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <WaliKelas />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/absenbyguru"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <AbsenByGuru />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/lihatsiswa"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <LihatSiswa />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/lihatwalimurid"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <LihatWaliMurid />
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/lihatnilaiuts"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <LihatNilaiUTS/>
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/lihatnilaiuas"
+              element={
+                <ProtectedRoute requiredRole="guru">
+                  <Guru>
+                    <LihatNilaiUAS/>
+                  </Guru>
+                </ProtectedRoute>
+              }
+            />
+            
 
             {/*=============== ADMIN ===============*/}
 
@@ -268,10 +384,21 @@ export default function App() {
                   <Admin>
                     <HomeAdmin />
                   </Admin>
-                  </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
             
+            <Route
+              path="/homeadminn"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Admin>
+                    <HomeAdmin2 />
+                  </Admin>
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/profileadmin"
               element={
@@ -279,7 +406,7 @@ export default function App() {
                   <Admin>
                     <ProfileAdmin />
                   </Admin>
-                  </ProtectedRoute>
+                </ProtectedRoute>
               }
             />
 
@@ -289,6 +416,17 @@ export default function App() {
                 <ProtectedRoute requiredRole="admin">
                   <Admin>
                     <DataSiswa />
+                  </Admin>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/editsiswa/:userId"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Admin>
+                    <EditSiswa />
                   </Admin>
                 </ProtectedRoute>
               }
@@ -305,6 +443,16 @@ export default function App() {
               }
             />
 
+            <Route
+              path="/editguru/:userId"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Admin>
+                    <EditGuru />
+                  </Admin>
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/tambahguru"
               element={
@@ -339,7 +487,7 @@ export default function App() {
             />
 
             <Route
-              path="/absenbyadmin"
+              path="/absenbyadmin/:kelasId"
               element={
                 <ProtectedRoute requiredRole="admin">
                   <Admin>
@@ -369,7 +517,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/tambahjadwal"
               element={
@@ -382,6 +530,17 @@ export default function App() {
             />
             
             <Route
+              path="/tambahwalikelas"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Admin>
+                    <TambahWaliKelas />
+                  </Admin>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
               path="/tambahwali"
               element={
                 <ProtectedRoute requiredRole="admin">
@@ -392,6 +551,16 @@ export default function App() {
               }
             />
 
+            <Route
+              path="/editwali/:userId"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Admin>
+                    <EditWali />
+                  </Admin>
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </GlobalProvider>
       </BrowserRouter>

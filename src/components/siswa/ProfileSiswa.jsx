@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import defaultProfile from "../../assets/ariel.jpeg";
+// import defaultProfile from "../../assets/ariel.jpeg";
 import Swal from "sweetalert2";
+
+const defaultProfile = "http://localhost:3000/uploads/1730897735320.jpg";
 
 export default function ProfileSiswa() {
   let config = {
@@ -13,7 +15,7 @@ export default function ProfileSiswa() {
   const [formData, setFormData] = useState({
     nis: "",
     kelasId: "",
-    // kelasNama: "",
+    kelasNama: "",
     semester: "",
     nama: "",
     ttl: "",
@@ -24,7 +26,7 @@ export default function ProfileSiswa() {
     foto: "",
   });
   const [file, setFile] = useState(null);
-  const [foto, setFoto] = useState(defaultProfile); // Menampilkan foto default
+  const [foto, setFoto] = useState(defaultProfile);
   const [fetchStatus, setFetchStatus] = useState(true);
 
   useEffect(() => {
@@ -197,7 +199,8 @@ export default function ProfileSiswa() {
                     NIS
                   </label>
                   <input
-                    type="text"
+                    disabled
+                    type="number"
                     id="nis"
                     name="nis"
                     value={formData.nis}
@@ -213,10 +216,11 @@ export default function ProfileSiswa() {
                     Kelas
                   </label>
                   <input
+                    disabled
                     type="text"
                     id="kelasId"
                     name="kelasId"
-                    value={formData.kelasId}
+                    value={formData.kelasNama}
                     onChange={handleChange}
                     className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
@@ -228,14 +232,22 @@ export default function ProfileSiswa() {
                   >
                     Semester
                   </label>
-                  <input
-                    type="text"
+                  <select
+                    required
                     id="semester"
                     name="semester"
                     value={formData.semester}
                     onChange={handleChange}
                     className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
+                  >
+                    <option value="">Pilih Semester</option>
+                    <option value="Satu / 1">Satu / 1</option>
+                    <option value="Dua / 2">Dua / 2</option>
+                    <option value="Tiga / 3">Tiga / 3</option>
+                    <option value="Empat / 4">Empat / 4</option>
+                    <option value="Lima / 5">Lima / 5</option>
+                    <option value="Enam / 6">Enam / 6</option>
+                  </select>
                 </div>
                 <div>
                   <label
@@ -322,6 +334,7 @@ export default function ProfileSiswa() {
                 </div>
                 <div className="flex justify-end items-end">
                   <button
+                    onClick={() => window.location.reload()}
                     type="button"
                     className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mt-2"
                   >

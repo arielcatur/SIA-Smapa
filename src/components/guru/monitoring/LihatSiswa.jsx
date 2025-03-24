@@ -1,69 +1,55 @@
 import { Card, Typography } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
-import { PLUS } from "../Icons";
 import axios from "axios";
 import Cookies from "js-cookie";
-import React, { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../../context/GlobalContext";
-import Swal from "sweetalert2";
+import React, { useEffect, useState } from "react";
+
 const TABLE_HEAD = [
-  "Id Wali",
+  "No",
   "Nama",
-  "Nama Siswa",
-  "No Telp",
-  "Tahun Lahir",
-  "Alamat",
-  "Email",
-  "Action",
+  //   "Kelas",
+  "Agama",
+  "NIS",
+  "Jenis Kelamin",
+  "Tempat Tanggal Lahir",
 ];
 
-export function DataWaliSiswa() {
-  const { handleFunction } = useContext(GlobalContext);
-  const { truncateDescription15 } = handleFunction;
+export function LihatSiswa() {
   let config = {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
   const [data, setData] = useState([]);
-  const [fetchStatus, setFetchStatus] = useState(true);
+  const [kelas, setKelas] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const dataPerPage = 5;
 
   useEffect(() => {
-    if (fetchStatus === true) {
-      axios
-        .get("http://localhost:3000/api/admin/wali-murid", config)
-        .then((res) => {
-          setData([...res.data.data]);
-        })
-        .catch((error) => {});
-      setFetchStatus(false);
-    }
-  }, [fetchStatus, setFetchStatus]);
-
-  const filteredData = data.filter(
-    (item) =>
-      item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.siswa.nama.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleDelete = (event) => {
-    let idData = parseInt(event.target.value);
-    console.log(idData);
     axios
-      .delete(`http://localhost:3000/api/admin/wali-murid/${idData}`, config)
+      .get("http://localhost:3000/api/guru/wali-kelas", config)
       .then((res) => {
-        setFetchStatus(true);
-        Swal.fire({
-          icon: "success",
-          title: "Sukses Menghapus Data",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        const siswaData = res.data.data.kelas.siswa.map((siswa) => ({
+          id: siswa.id,
+          nama: siswa.nama,
+          //   kelas: res.data.data.kelas.nama,
+          agama: siswa.agama,
+          nis: siswa.nis,
+          jk: siswa.jk,
+          ttl: siswa.ttl,
+        }));
+        setData(siswaData);
+        const kelasData = res.data.data.kelas.nama;
+        setKelas(kelasData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
       });
-  };
+  }, []);
+
+  const filteredData = data.filter((item) =>
+    item.nama.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const indexOfLastData = currentPage * dataPerPage;
   const indexOfFirstData = indexOfLastData - dataPerPage;
@@ -81,31 +67,30 @@ export function DataWaliSiswa() {
     }
   };
 
+  if (data.length === 0) {
+    return (
+      <div className="ml-80 py-4">
+        <p className="flex justify-center font-bold text-xl">Anda bukan wali kelas</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="ml-80 py-4">
-        <p className="flex justify-center font-bold text-xl">
-          Daftar Wali Siswa
-        </p>
-        <div className="mx-4 flex justify-end">
-          {/* <p className="pt-2 font-semibold text-base">Daftar Wali Siswa</p> */}
-          <div className="grid grid-cols-[auto_auto] gap-2">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="border h-[37.6px] border-gray-300 p-2"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Link to={"/tambahwali"} className="">
-              <button
-                type="submit"
-                className="w-[40px] h-[37.6px] text-white bg-blue-400 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-200 font-medium"
-              >
-                <PLUS />
-              </button>
-            </Link>
-          </div>
+        <p className="flex justify-center font-bold text-xl">Daftar Siswa</p>
+        <div className=" mx-4 flex justify-between">
+          {/* Nama Kelas */}
+
+          <p className="pt-2 font-semibold text-base">Kelas {kelas}</p>
+          {/* Search Input */}
+          <input
+            type="text"
+            placeholder="Cari Nama Siswa..."
+            className="border h-[37.6px] border-gray-300 p-2"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
       <Card className="h-full ml-80 rounded-none">
@@ -138,7 +123,7 @@ export function DataWaliSiswa() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {res.id}
+                      {indexOfFirstData + index + 1}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
@@ -150,13 +135,22 @@ export function DataWaliSiswa() {
                       {res.nama}
                     </Typography>
                   </td>
+                  {/* <td className="p-4 border-b border-blue-gray-50">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {res.kelas}
+                    </Typography>
+                  </td> */}
                   <td className="p-4 border-b border-blue-gray-50">
                     <Typography
                       variant="small"
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {res.siswa.nama}
+                      {res.agama}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
@@ -165,7 +159,16 @@ export function DataWaliSiswa() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {res.noTelp}
+                      {res.nis}
+                    </Typography>
+                  </td>
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {res.jk}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
@@ -176,36 +179,6 @@ export function DataWaliSiswa() {
                     >
                       {res.ttl}
                     </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {truncateDescription15(res.alamat)}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.email}
-                      
-                    </Typography>
-                  </td>
-                  <td className="grid grid-cols-2 text-white p-4 border-b border-blue-gray-50">
-                    <Link
-                      to={`/editwali/${res.user.id}`}
-                      className="bg-blue-300 border border-white h-8 hover:bg-blue-400"
-                    >
-                      <button className="pt-1">Edit</button>
-                    </Link>
-                    <button value={res.user.id} onClick={handleDelete} className="bg-red-300 border border-white h-8 hover:bg-red-400">
-                      Delete
-                    </button>
                   </td>
                 </tr>
               ))

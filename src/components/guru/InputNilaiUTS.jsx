@@ -8,7 +8,7 @@ import {
 import { ARROWRIGHT } from "../Icons";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 export function InputNilaiUTS() {
@@ -25,12 +25,12 @@ export function InputNilaiUTS() {
       axios
         .get("http://localhost:3000/api/guru/kelas", config)
         .then((res) => {
-          // console.log(res.data.data);
           setData([...res.data.data]);
         })
         .catch((error) => {});
-      setFetchStatus(false);
-    }
+        setFetchStatus(false);
+      }
+      // console.log(data);
   }, [fetchStatus, setFetchStatus]);
 
   return (
@@ -50,7 +50,8 @@ export function InputNilaiUTS() {
               <CardFooter className="mt-0 pt-0">
                 <div className="flex justify-between p-2 border-black border-2">
                   <div>{res.nama}</div>
-                  <Link to={"/nilaiutsguru"}>
+                  {/* <Link to={"/nilaiutsguru"}> */}
+                  <Link to={`/nilaiutsguru/${res.id}`}>
                     <button className="bg-black w-8 h-8 border-4 border-black ">
                       <ARROWRIGHT />
                     </button>

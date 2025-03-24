@@ -1,35 +1,68 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
+import { useParams } from "react-router-dom";
 
-const defaultProfile = "http://localhost:3000/uploads/1732526553714.jpg";
+const defaultProfile = "http://localhost:3000/uploads/1730897735320.jpg";
 
-export default function TambahGuru() {
-  let config = {
+export default function EditSiswa() {
+  const { userId } = useParams();
+  const config = {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
+
   const [formData, setFormData] = useState({
-    nig: "",
-    username: "",
-    password: "",
+    nis: "",
+    kelasId: "",
+    semester: "",
     nama: "",
     ttl: "",
     jk: "",
     agama: "",
     noTelp: "",
     alamat: "",
-    foto: "",
+    foto: "", // Mulai dengan foto kosong
   });
   const [file, setFile] = useState(null);
   const [foto, setFoto] = useState(defaultProfile);
+  const [kelas, setKelas] = useState([]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/admin/kelas", config).then((res) => {
+      setKelas(res.data.data);
+    });
+
+    axios
+      .get("http://localhost:3000/api/admin/siswa", config)
+      .then((res) => {
+        const siswaData = res.data.data.find((siswa) => {
+          return siswa.user && siswa.user.id === parseInt(userId);
+        });
+        if (siswaData) {
+          setFormData({
+            nis: siswaData.nis,
+            kelasId: siswaData.kelas.id,
+            semester: siswaData.semester,
+            nama: siswaData.nama,
+            ttl: siswaData.ttl,
+            jk: siswaData.jk,
+            agama: siswaData.agama,
+            noTelp: siswaData.noTelp,
+            alamat: siswaData.alamat,
+            foto: siswaData.foto || defaultProfile, // Gunakan foto yang ada atau default
+          });
+          setFoto(siswaData.foto || defaultProfile);
+        } else {
+          alert("Data siswa tidak ditemukan.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching student data:", error);
+      });
+  }, [userId]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -39,45 +72,14 @@ export default function TambahGuru() {
     }
   };
 
-  // const uploadPhoto = async (selectedFile) => {
-  //   const formData = new FormData();
-  //   formData.append("foto", selectedFile);
-
-  //   try {
-  //     const response = await axios.post(
-  //       "http://localhost:3000/api/uploads",
-  //       formData,
-  //       {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           Authorization: `Bearer ${Cookies.get("token")}`,
-  //         },
-  //       }
-  //     );
-
-  //     if (response.data.status) {
-  //       setFoto(response.data.data.foto);
-  //       setFormData({ ...formData, foto: response.data.data.foto });
-  //       alert(response.data.message);
-  //     } else {
-  //       alert("Upload foto gagal.");
-  //     }
-  //   } catch (error) {
-  //     console.error(
-  //       "Error uploading photo:",
-  //       error.response ? error.response.data : error.message
-  //     );
-  //     alert("Terjadi kesalahan saat mengupload foto.");
-  //   }
-  // };
   const uploadPhoto = async (selectedFile) => {
-    const uploadData = new FormData();
-    uploadData.append("foto", selectedFile);
+    const formData = new FormData();
+    formData.append("foto", selectedFile);
 
     try {
       const response = await axios.post(
         "http://localhost:3000/api/uploads",
-        uploadData,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -88,9 +90,9 @@ export default function TambahGuru() {
 
       if (response.data.status) {
         setFoto(response.data.data.foto);
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          foto: response.data.data.foto,
+        setFormData((prevData) => ({
+          ...prevData,
+          foto: response.data.data.foto, // Update foto jika diupload
         }));
         alert(response.data.message);
       } else {
@@ -108,17 +110,13 @@ export default function TambahGuru() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const updatedFormData = {
-      ...formData,
-      foto: formData.foto || defaultProfile,
-    };
-
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/admin/guru",
+        `http://localhost:3000/api/admin/siswa/${userId}`,
         {
-          ...updatedFormData,
-          // nig: parseInt(formData.nig),
+          ...formData,
+          kelasId: parseInt(formData.kelasId),
+          foto: file ? formData.foto : formData.foto || defaultProfile, // Gunakan foto baru jika diupload, jika tidak gunakan foto yang ada atau default
         },
         config
       );
@@ -131,24 +129,21 @@ export default function TambahGuru() {
           timer: 1500,
         });
       } else {
-        alert("Gagal menyimpan data guru.");
+        alert("Gagal menyimpan data siswa.");
       }
     } catch (error) {
-      console.error("Error saving teacher data:", error);
+      console.error("Error saving student data:", error);
       alert(`Error: ${error.response?.data?.message || "Terjadi kesalahan"}`);
     }
-    setFormData({
-      nig: "",
-      username: "",
-      password: "",
-      nama: "",
-      ttl: "",
-      jk: "",
-      agama: "",
-      noTelp: "",
-      alamat: "",
-      foto: "",
-    });
+  };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleKelasChange = (event) => {
+    const selectedKelasId = event.target.value;
+    setFormData({ ...formData, kelasId: selectedKelasId });
   };
 
   return (
@@ -177,42 +172,9 @@ export default function TambahGuru() {
               />
             )}
           </div>
+
           <div>
             <div className="grid grid-cols-2 gap-2 mx-auto my-3">
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Username
-                </label>
-                <input
-                  required
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Password
-                </label>
-                <input
-                  required
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                />
-              </div>
               <div>
                 <label
                   htmlFor="nama"
@@ -232,20 +194,66 @@ export default function TambahGuru() {
               </div>
               <div>
                 <label
-                  htmlFor="nig"
+                  htmlFor="nis"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  NIP
+                  NIS
                 </label>
                 <input
                   required
                   type="number"
-                  id="nig"
-                  name="nig"
-                  value={formData.nig}
+                  id="nis"
+                  name="nis"
+                  value={formData.nis}
                   onChange={handleChange}
                   className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 />
+              </div>
+              <div>
+                <label
+                  htmlFor="kelasId"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Kelas
+                </label>
+                <select
+                  onChange={handleKelasChange}
+                  value={formData.kelasId}
+                  name="kelasId"
+                  className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                >
+                  <option value="">Pilih Kelas</option>
+                  {kelas.map((res) => (
+                    <option key={res.id} value={res.id}>
+                      {res.nama}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="semester"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Semester
+                </label>
+                <select
+                  required
+                  id="semester"
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="">Pilih Semester</option>
+                  <option value="Satu / 1">Satu / 1</option>
+                  <option value="Dua / 2">Dua / 2</option>
+                  <option value="Tiga / 3">Tiga / 3</option>
+                  <option value="Empat / 4">Empat / 4</option>
+                  <option value="Lima / 5">Lima / 5</option>
+                  <option value="Enam / 6">Enam / 6</option>
+                </select>
               </div>
               <div>
                 <label
@@ -337,6 +345,7 @@ export default function TambahGuru() {
               </div>
               <div className="flex justify-end items-end">
                 <button
+                  onClick={() => window.location.reload()}
                   type="button"
                   className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mt-2"
                 >

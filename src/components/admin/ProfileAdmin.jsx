@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import defaultProfile from "../../assets/ariel.jpeg";
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 export default function ProfileAdmin() {
   let config = {
@@ -30,12 +30,12 @@ export default function ProfileAdmin() {
         .then((res) => {
           // console.log(res.data.data);
           const data = res.data.data;
-          console.log("Jenis Kelamin dari API:", data.jk);
+          // console.log("Jenis Kelamin dari API:", data.jk);
           setFormData({
             nama: data.nama || "",
             ttl: data.ttl || "",
-            // jk: data.jk || "",
-            jk: data.jk === "laki laki" ? "Laki-laki" : data.jk === "P" ? "Perempuan" : "",
+            jk: data.jk || "",
+            // jk: data.jk === "laki laki" ? "Laki-laki" : data.jk === "P" ? "Perempuan" : "",
             agama: data.agama || "",
             noTelp: data.noTelp || "",
             alamat: data.alamat || "",
@@ -58,7 +58,7 @@ export default function ProfileAdmin() {
   const uploadPhoto = async (selectedFile) => {
     const formDataPhoto = new FormData();
     formDataPhoto.append("foto", selectedFile);
-  
+
     try {
       const response = await axios.post(
         "http://localhost:3000/api/uploads",
@@ -70,12 +70,12 @@ export default function ProfileAdmin() {
           },
         }
       );
-  
+
       if (response.data.status) {
         setFoto(response.data.data.foto);
         setFormData((prevData) => ({
           ...prevData,
-          foto: response.data.data.foto, 
+          foto: response.data.data.foto,
         }));
         alert(response.data.message);
       } else {
@@ -89,7 +89,7 @@ export default function ProfileAdmin() {
       alert("Terjadi kesalahan saat mengupload foto.");
     }
   };
-  
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -97,13 +97,13 @@ export default function ProfileAdmin() {
       uploadPhoto(selectedFile);
     }
   };
-  
+
   const handleSubmit = (event) => {
     event.preventDefault();
-  
+
     const updatedFormData = {
-      // nis: formData.nis || "", 
-      // kelasId: formData.kelasId ? parseInt(formData.kelasId) : "", 
+      // nis: formData.nis || "",
+      // kelasId: formData.kelasId ? parseInt(formData.kelasId) : "",
       // semester: formData.semester || "",
       nama: formData.nama || "",
       ttl: formData.ttl || "",
@@ -113,11 +113,15 @@ export default function ProfileAdmin() {
       alamat: formData.alamat || "",
       foto: formData.foto || "",
     };
-  
+
     console.log(updatedFormData);
-  
+
     axios
-      .post("http://localhost:3000/api/admin/profile/update", updatedFormData, config)
+      .post(
+        "http://localhost:3000/api/admin/profile/update",
+        updatedFormData,
+        config
+      )
       .then((res) => {
         console.log(res);
         setFetchStatus(true);
@@ -126,7 +130,7 @@ export default function ProfileAdmin() {
           icon: "success",
           title: "Sukses Menyimpan Data",
           showConfirmButton: false,
-          timer: 1500
+          timer: 1500,
         });
       })
       .catch((error) => {
@@ -267,6 +271,7 @@ export default function ProfileAdmin() {
               </div>
               <div className="flex justify-end">
                 <button
+                  onClick={() => window.location.reload()}
                   type="button"
                   className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                 >

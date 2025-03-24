@@ -1,38 +1,53 @@
 import { Card, Typography } from "@material-tailwind/react";
-import Search from "../Search";
 import axios from "axios";
 import Cookies from "js-cookie";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const TABLE_HEAD = [
-  "No",
-  "Nama",
-  "Kelas",
-  "Agama",
-  "NIP",
-  "Jenis Kelamin",
-  "Tempat Tanggal Lahir",
-];
+export function LihatNilaiUAS() {
+  const [data, setData] = useState([]);
+  const [kelas, setKelas] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [tableHead, setTableHead] = useState([]); // Dynamic table head
+  const dataPerPage = 5;
 
-export function DaftarSiswa() {
   let config = {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   };
-  const [data, setData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const dataPerPage = 5;
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/guru/siswa", config)
+      .get("http://localhost:3000/api/guru/wali-kelas", config)
       .then((res) => {
-        setData([...res.data.data]);
-        console.log(res.data.data)
+        const siswaData = res.data.data.kelas.siswa.map((siswa) => ({
+          id: siswa.id,
+          nama: siswa.nama,
+          nilaiUas: siswa.nilaiUas.map((nilai) => ({
+            nilai: nilai.nilai,
+            mataPelajaran: nilai.mataPelajaran.nama,
+          })),
+        }));
+
+        setData(siswaData);
+
+        const kelasData = res.data.data.kelas.nama;
+        setKelas(kelasData);
+
+        // Extract and deduplicate subject names for the table head
+        const subjects = Array.from(
+          new Set(
+            siswaData
+              .flatMap((siswa) => siswa.nilaiUas)
+              .map((nilai) => nilai.mataPelajaran)
+          )
+        );
+        setTableHead(["No", "Nama", ...subjects]); // Include "No" and "Nama" as fixed headers
       })
-      .catch((error) => {});
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
   }, []);
 
   const filteredData = data.filter((item) =>
@@ -55,12 +70,20 @@ export function DaftarSiswa() {
     }
   };
 
+  if (data.length === 0) {
+    return (
+      <div className="ml-80 py-4">
+        <p className="flex justify-center font-bold text-xl">Anda bukan wali kelas</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="ml-80 py-4">
-        <p className="flex justify-center font-bold text-xl">Daftar Siswa</p>
+        <p className="flex justify-center font-bold text-xl">Nilai UTS</p>
         <div className="mx-4 flex justify-between">
-          <p className="pt-2 font-semibold text-base">Daftar Siswa</p>
+          <p className="pt-2 font-semibold text-base">Kelas {kelas}</p>
           <input
             type="text"
             placeholder="Cari Nama Siswa..."
@@ -70,11 +93,13 @@ export function DaftarSiswa() {
           />
         </div>
       </div>
+
       <Card className="h-full ml-80 rounded-none">
+        <div className="overflow-x-auto">
         <table className="w-full min-w-max table-auto text-center">
           <thead>
             <tr>
-              {TABLE_HEAD.map((head) => (
+              {tableHead.map((head) => (
                 <th
                   key={head}
                   className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
@@ -112,56 +137,27 @@ export function DaftarSiswa() {
                       {res.nama}
                     </Typography>
                   </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.kelas.nama}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.agama}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.nis}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.jk}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {res.ttl}
-                    </Typography>
-                  </td>
+                  {tableHead.slice(2).map((subject, i) => {
+                    const nilai = res.nilaiUas.find(
+                      (nilai) => nilai.mataPelajaran === subject
+                    );
+                    return (
+                      <td key={i} className="p-4 border-b border-blue-gray-50">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {nilai ? nilai.nilai : '-'}
+                        </Typography>
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={TABLE_HEAD.length} className="p-4">
+                <td colSpan={tableHead.length} className="p-4">
                   <Typography
                     variant="small"
                     color="blue-gray"
@@ -174,6 +170,7 @@ export function DaftarSiswa() {
             )}
           </tbody>
         </table>
+        </div>
         <div className="flex justify-end p-4">
           <button
             onClick={handlePreviousPage}

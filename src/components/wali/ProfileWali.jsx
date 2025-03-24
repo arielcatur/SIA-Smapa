@@ -18,6 +18,7 @@ export default function ProfileWali() {
     email: "",
     foto: "",
     namaSiswa: "",
+    ttl: "",
   });
   const [file, setFile] = useState(null);
   const [foto, setFoto] = useState(defaultProfile);
@@ -37,6 +38,7 @@ export default function ProfileWali() {
             noTelp: data.noTelp || "",
             alamat: data.alamat || "",
             email: data.email || "",
+            ttl: data.ttl || "",
             namaSiswa: data.siswa.nama || "",
             foto: data.foto || "",
           });
@@ -88,13 +90,13 @@ export default function ProfileWali() {
     }
   };
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      uploadPhoto(selectedFile);
-    }
-  };
+  // const handleFileChange = (e) => {
+  //   const selectedFile = e.target.files[0];
+  //   if (selectedFile) {
+  //     setFile(selectedFile);
+  //     uploadPhoto(selectedFile);
+  //   }
+  // };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -105,6 +107,7 @@ export default function ProfileWali() {
       noTelp: formData.noTelp || "",
       alamat: formData.alamat || "",
       email: formData.email || "",
+      ttl: formData.ttl || "",
       foto: formData.foto || "",
     };
 
@@ -120,7 +123,6 @@ export default function ProfileWali() {
         console.log(res);
         setFetchStatus(true);
         Swal.fire({
-          // position: "top-end",
           icon: "success",
           title: "Sukses Menyimpan Data",
           showConfirmButton: false,
@@ -217,14 +219,13 @@ export default function ProfileWali() {
                     htmlFor="siswaId"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    ID Siswa
+                    Tahun lahir
                   </label>
                   <input
-                    disabled
                     type="text"
-                    id="siswaId"
-                    name="siswaId"
-                    value={formData.siswaId}
+                    id="ttl"
+                    name="ttl"
+                    value={formData.ttl}
                     onChange={handleChange}
                     className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
@@ -249,6 +250,7 @@ export default function ProfileWali() {
               </div>
               <div className="flex justify-end">
                 <button
+                  onClick={() => window.location.reload()}
                   type="button"
                   className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
                 >

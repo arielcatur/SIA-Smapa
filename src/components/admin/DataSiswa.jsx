@@ -4,6 +4,7 @@ import { PLUS } from "../Icons";
 import axios from "axios";
 import Cookies from "js-cookie";
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 const TABLE_HEAD = [
   "Id Siswa",
@@ -60,12 +61,28 @@ export function DataSiswa() {
     }
   };
 
+  const handleDelete = (event) => {
+    let idData = parseInt(event.target.value);
+    console.log(idData);
+    axios
+      .delete(`http://localhost:3000/api/admin/siswa/${idData}`, config)
+      .then((res) => {
+        setFetchStatus(true);
+        Swal.fire({
+          icon: "success",
+          title: "Sukses Menghapus Data",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
+  };
+
   return (
     <>
       <div className="ml-80 py-4">
         <p className="flex justify-center font-bold text-xl">Daftar Siswa</p>
-        <div className="mx-4 flex justify-between">
-          <p className="pt-2 font-semibold text-base">Daftar Siswa</p>
+        <div className="mx-4 flex justify-end">
+          {/* <p className="pt-2 font-semibold text-base">Daftar Siswa</p> */}
           <div className="grid grid-cols-[auto_auto] gap-2">
             <input
               type="text"
@@ -110,40 +127,73 @@ export function DataSiswa() {
               currentData.map((res, index) => (
                 <tr key={res.id}>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
                       {res.id}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-semibold"
+                    >
                       {res.nama}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
                       {res.kelas.nama}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
                       {res.nis}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
                       {res.jk}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography variant="small" color="blue-gray" className="font-normal">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
                       {res.ttl}
                     </Typography>
                   </td>
                   <td className="grid grid-cols-2 text-white p-4 border-b border-blue-gray-50">
-                    <button className="bg-blue-300 border border-white h-8 hover:bg-blue-400">
-                      Edit
-                    </button>
-                    <button className="bg-red-300 border border-white h-8 hover:bg-red-400">
+                    <Link 
+                    to={`/editsiswa/${res.user.id}`} 
+                    className="bg-blue-300 border border-white h-8 hover:bg-blue-400"
+                    >
+                      <button className="pt-1">
+                        Edit
+                      </button>
+                    </Link>
+                    <button
+                      onClick={handleDelete}
+                      value={res.user.id}
+                      className="bg-red-300 border border-white h-8 hover:bg-red-400"
+                    >
                       Delete
                     </button>
                   </td>
@@ -152,7 +202,11 @@ export function DataSiswa() {
             ) : (
               <tr>
                 <td colSpan={TABLE_HEAD.length} className="p-4">
-                  <Typography variant="small" color="blue-gray" className="font-normal">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal"
+                  >
                     Tidak ada data yang ditemukan.
                   </Typography>
                 </td>
